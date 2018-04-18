@@ -9,19 +9,17 @@ For further details, visit the [ZXDB forum section](https://spectrumcomputing.co
 
 ## Getting Started
 
-Simply download the latest database content, then load it into MySQL/MariaDB.
-
-You have the following choices:
+Simply download the latest database content, then load it into MySQL/MariaDB:
 
 * `ZXDB_mysql.sql` - The latest complete ZXDB database script for MySQL/MariaDB. That's all you really need!
-
-* `ZXDB_generic.sql` - Same as above, except without MySQL/MariaDB directives.
 
 Optionally you can execute one of the provided scripts to convert file `ZXDB_mysql.sql` above to a different RDBMS:
 
 * `ZXDB_to_SQLServer.ps1` - Powershell script to convert ZXDB into SQL Server compatible T-SQL
 
 * `ZXDB_to_SQLite.py` - Python script to convert ZXDB into SQLite compatible SQL
+
+* `ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
 
 
 ## Database model
