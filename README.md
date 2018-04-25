@@ -34,13 +34,14 @@ The ZXDB schema is described below:
 * `labels` - individuals and companies (authors, publishers, development teams, copyright holders)
 
 * `magazines` - published magazines (printed or electronic). The magazine link mask follows this convention:
-  * `{iN}` - magazine issue number, with (at least) N digits
-  * `{vN}` - magazine issue volume number, with (at least) N digits
-  * `{yN}` - magazine issue year, with (at least) N digits
-  * `{mN}` - magazine issue month, with (at least) N digits
-  * `{MN}` - magazine issue month name, with exactly N letters (starting with uppercase)
-  * `{dN}` - magazine issue day, with (at least) N digits
-  * `{pN}` - page number, with (at least) N digits
+  * `{i#}` - magazine issue number, with (at least) # digits
+  * `{v#}` - magazine issue volume number, with (at least) # digits
+  * `{y#}` - magazine issue year, with (at least) # digits
+  * `{m#}` - magazine issue month, with (at least) # digits
+  * `{M#}` - magazine issue month name, with exactly # letters (starting with uppercase)
+  * `{d#}` - magazine issue day, with (at least) # digits
+  * `{p#}` - page number, with (at least) # digits
+  * `{s#}` - magazine special issue string, preceded by character '#'
 
 * `releases` - each release of an item (date, price, publisher, etc)
   * `release_seq=0` - original release
@@ -201,9 +202,9 @@ Tables prefixed with `spex_` contain information from SPOT/SPEX archive that dif
 
 Table `sscgc_authors` contains pending information about CSSCGC authors (to be revised soon).
 
-All other local file links starting with `/pub/` refer to content previously available at the original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://ia800604.us.archive.org/zipview.php?zip=/1/items/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip&file=World%20of%20Spectrum%20June%202017%20Mirror/
+Local file links starting with `/pub/sinclair/` refer to content previously available at the original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
 
-Local file links starting with `/zxdb/` refer to content added afterwards. These files are currently stored at http://spectrumcomputing.co.uk/zxdb/
+Local file links starting with `/zxdb/sinclair/` refer to content added afterwards. These files are currently stored at https://spectrumcomputing.co.uk/zxdb/sinclair/
 
 
 ## Disclaimer
@@ -259,7 +260,7 @@ Also special thanks to everyone that contributed to the creation of ZXDB, partic
 
 The following websites directly use ZXDB internally:
 
-* [Spectrum Computing](http://spectrumcomputing.co.uk/) - ZX-Spectrum archive based on ZXDB, maintained by **Peter Jones** and **Ricardo Nunes**.
+* [Spectrum Computing](https://spectrumcomputing.co.uk/) - ZX-Spectrum archive based on ZXDB, maintained by **Peter Jones** and **Ricardo Nunes**.
 
 * [ZXInfo](https://zxinfo.dk/) - ZX-Spectrum archive based on ZXDB, built with ElasticSearch by **Thomas Kolbeck**.
 
@@ -285,7 +286,7 @@ The following websites are fully integrated with ZXDB:
 
 * [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZXDB title links to the corresponding webpage at **Simon Holdsworth**'s site.
 
-* [Wikipedia](http://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia
+* [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia
 
 * [MobyGames](http://www.mobygames.com/) - Each ZXDB title links to the corresponding webpage at MobyGames.
 
