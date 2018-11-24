@@ -134,7 +134,7 @@ The ZXDB schema is described below:
   * `Never released` - items never released (for whatever reason)
   * `Never released - recovered` - items never officially released, later recovered/preserved
 
-* `countries` - list of countries (using ISO 3166-1 Alpha-2 codes)
+* `countries` - list of countries (using ISO 3166-1 Alpha-2 standard codes)
 
 * `filetypes` - list of file types (screenshot, tape image, inlay, photo, poster, etc)
 
@@ -153,7 +153,7 @@ The ZXDB schema is described below:
   * `Turn Mode` - programs that support a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
   * `Control Option` - programs that support a certain control option (Kempston joystick, redefineable keys, etc)
 
-* `idioms` - list of idioms (using ISO 639-1 codes)
+* `idioms` - list of idioms (using ISO 639-1 standard codes)
 
 * `labeltypes` - list of label types (person, nickname, companies)
 
