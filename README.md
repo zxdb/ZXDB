@@ -306,3 +306,5 @@ The following websites are fully integrated with ZXDB:
 
 * [The Spectrum Show](http://www.thespectrumshow.co.uk/) - Each ZXDB title links to the corresponding video at **Paul Jenkinson**'s channel.
 
+
+![ZXDB](images/ZXDB_8.png)
