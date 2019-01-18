@@ -294,8 +294,6 @@ The following websites are fully integrated with ZXDB:
 
 * [Lost in Translation](http://www.exotica.org.uk/) - Each ZXDB title links to the corresponding webpage at Lost in Translation.
 
-* [Freebase](http://zxspectrum.freebase.com/) - Each ZXDB title links to the corresponding webpage at Freebase.
-
 * [The Tipshop](http://www.the-tipshop.co.uk/) - Each ZXDB title links to the corresponding webpage at **Gerard Sweeney**'s site.
 
 * [WorldOfSpectrum](http://www.worldofspectrum.org/) - Each ZXDB title links to the corresponding webpage at **Martijn van der Heide**'s site.
