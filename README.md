@@ -75,15 +75,13 @@ The ZXDB schema is described below:
 
 * `labelfiles` - available material related to a specific label (photos, posters, advertisements, etc)
 
-* `licenses` - inspirations or tie-in licenses for certain games (from arcades, books, movies, etc)
+* `licenses` - inspirations or tie-in licenses (from arcades, books, movies, etc)
 
 * `magfiles` - magazine issues content (electronic magazine files, printed magazine scans, covertape music, etc)
 
 * `nvgs` - oldest files preserved from ftp.nvg.unit.no
 
 * `ports` - Spectrum programs also released on other platforms
-
-* `relatedlinks` - existing pages about Spectrum programs at other main websites
 
 * `remakes` - modern remakes of Spectrum programs
 
@@ -120,6 +118,10 @@ The ZXDB schema is described below:
   * `publisher_seq=1` - 1st publisher of a specific release (or unique publisher)
   * `publisher_seq=2` - 2nd publisher (only if same release has multiple publishers)
   * `...`
+
+* `relatedlicenses` - associate programs to their inspirations or tie-in licenses
+
+* `relatedlinks` - associate programs to pages at other main websites
 
 * `roles` - associate authors to their roles (for each entry)
 
