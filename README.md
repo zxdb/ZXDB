@@ -202,8 +202,6 @@ Tables prefixed with `search_by_` are auxiliary tables to help database searches
 
 Tables prefixed with `spex_` contain information from SPOT/SPEX archive that differs from original WorldOfSpectrum archive, thus pending further investigation later.
 
-Table `sscgc_authors` contains pending information about CSSCGC authors (to be revised soon).
-
 Local file links starting with `/pub/sinclair/` refer to content previously available at the original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
 
 Local file links starting with `/zxdb/sinclair/` refer to content added afterwards. These files are currently stored at https://spectrumcomputing.co.uk/zxdb/sinclair/
