@@ -121,9 +121,9 @@ The ZXDB schema is described below:
 
 * `relatedlicenses` - associate programs to their inspirations or tie-in licenses
 
-* `relatedlinks` - associate programs to pages at other main websites
-
 * `roles` - associate authors to their roles (for each entry)
+
+* `webrefs` - associate programs to webpages about them at other main websites
 
 
 #### _ENUMERATION TABLES_
@@ -170,8 +170,6 @@ The ZXDB schema is described below:
   * `ZX-Spectrum 128K (load in USR0 mode)` - programs that require (at least) 128K, and must be loaded in USR0 mode
   * `...`
 
-* `origintypes` - indicates "origin" of certain files (according to Martijn's internal notes)
-
 * `permissiontypes` - permission types:
   * `Allowed` - copyright owner allowed distribution permission for all titles
   * `Denied` - copyright owner denied distribution permission for all titles
@@ -190,6 +188,8 @@ The ZXDB schema is described below:
 * `roletypes` - roles by authors on program development (design, graphics, code, music, etc)
 
 * `schemetypes` - tape protection schemes for programs
+
+* `sourcetypes` - indicates "source" of certain files (according to Martijn's internal notes)
 
 * `topictypes` - magazine section types
 
