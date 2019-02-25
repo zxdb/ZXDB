@@ -103,8 +103,6 @@ The ZXDB schema is described below:
 
 * `compilations` - associate compilations to their list of programs
 
-* `frameworks` - associate utilities (like P.A.W.) to programs authored with them
-
 * `licensors` - associate licenses to their license owners
 
 * `magrefs` - associate entries or labels to pages from magazine issues about them
@@ -120,6 +118,8 @@ The ZXDB schema is described below:
   * `...`
 
 * `relatedlicenses` - associate programs to their inspirations or tie-in licenses
+
+* `relations` - relationships between programs (inspired by, authored with, etc)
 
 * `roles` - associate authors to their roles (for each entry)
 
@@ -137,6 +137,8 @@ The ZXDB schema is described below:
   * `Never released - recovered` - items never officially released, later recovered/preserved
 
 * `countries` - list of countries (using ISO 3166-1 Alpha-2 standard codes)
+
+* `extensions` - list of supported filename extensions in ZXDB
 
 * `filetypes` - list of file types (screenshot, tape image, inlay, photo, poster, etc)
 
@@ -184,6 +186,8 @@ The ZXDB schema is described below:
   * `Type-in` - program was originally released as type-in (from book or magazine)
 
 * `referencetypes` - references from magazines about entries or labels (preview, review, advert, type-in, solution, etc)
+
+* `relationtypes` - types of relationships between programs (inspired by, authored with, etc)
 
 * `roletypes` - roles by authors on program development (design, graphics, code, music, etc)
 
