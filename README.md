@@ -239,6 +239,8 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/doc/);
 
+* **Pavel Pliva**: for directly working on ZXDB, patiently cataloguing typed instructions and hires inlays, and implementing our internal ZX-Ed's upload tool;
+
 * **Helga Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
 
 * **Peter Jones**, and **Ricardo Nunes**: for building [Spectrum Computing](https://spectrumcomputing.co.uk/) that hosts the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) (and also providing inumerous other contributions to ZXDB content);
