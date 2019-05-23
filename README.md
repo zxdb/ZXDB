@@ -237,9 +237,11 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Dave Hughes**: for directly working on ZXDB, patiently cataloguing each new individual ZX-Spectrum title in ZXDB;
 
-* **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/doc/);
+* **Dario Ruellan**: for directly working on ZXDB, patiently cataloguing each recovered old ZX-Spectrum title and fixing inaccurate information in ZXDB;
 
-* **Pavel Pliva**: for directly working on ZXDB, patiently cataloguing typed instructions and hires inlays, and implementing our internal ZX-Ed's upload tool;
+* **Pavel Pliva**: for directly working on ZXDB, patiently cataloguing typed instructions and hires inlays, and implementing our internal file upload tool;
+
+* **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/doc/);
 
 * **Helga Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
 
