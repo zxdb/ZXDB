@@ -69,7 +69,7 @@ The ZXDB schema is described below:
 
 * `hosts` - main services that provide information about certain features
 
-* `interviews` - interviews provided by authors, publishers, etc
+* `interviews` - website interviews provided by authors, publishers, etc
 
 * `issues` - each published issue of a magazine
 
