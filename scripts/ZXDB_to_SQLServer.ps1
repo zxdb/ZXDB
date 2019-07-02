@@ -23,7 +23,7 @@ $sw = new-object System.IO.Streamwriter($currentOutputfile, $false, [System.Text
 for ($rownum =0; $rownum -lt $totalRows; $rownum++)
 {
     $progress = ($rownum / $totalRows) * 100
-    write-progress -id 1 -Activity 'Rewriting files' -status "% comlete: $('{0:N2}' -f $progress)" -PercentComplete $progress
+    write-progress -id 1 -Activity 'Rewriting files' -status "% complete: $('{0:N2}' -f $progress)" -PercentComplete $progress
 
     $text = $source[$rownum]
 
