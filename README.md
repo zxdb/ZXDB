@@ -15,11 +15,15 @@ Simply download the latest database content, then load it into MySQL/MariaDB:
 
 Optionally you can execute one of the provided scripts to convert file `ZXDB_mysql.sql` above to a different RDBMS:
 
-* `ZXDB_to_SQLServer.ps1` - Powershell script to convert ZXDB into SQL Server compatible T-SQL
+* `scripts/ZXDB_to_SQLServer.ps1` - Powershell script to convert ZXDB into SQL Server compatible T-SQL
 
-* `ZXDB_to_SQLite.py` - Python script to convert ZXDB into SQLite compatible SQL
+* `scripts/ZXDB_to_SQLite.py` - Python script to convert ZXDB into SQLite compatible SQL
 
-* `ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
+* `scripts/ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
+
+There's also an optional script to create auxiliary tables, that can be used to help database searches. Ideally these tables must be repopulated whenever ZXDB content changes, or defined as materialized views in a RDBMS that supports it:
+
+* `scripts/ZXDB_help_search.sql` - Script to create auxiliary tables prefixed with `search_by_`
 
 
 ## Database model
@@ -202,8 +206,6 @@ The ZXDB schema is described below:
 
 #### _ADDITIONAL DETAILS_
 
-Tables prefixed with `search_by_` are auxiliary tables to help database searches. They are only needed for systems that perform ZXDB searches directly in the database.
-
 Tables prefixed with `spex_` contain information from SPOT/SPEX archive that differs from original WorldOfSpectrum archive, thus pending further investigation later.
 
 Local file links starting with `/pub/sinclair/` refer to content previously available at the original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
@@ -243,7 +245,7 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/doc/);
 
-* **Helga Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
+* **Elia Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
 
 * **Peter Jones**, and **Ricardo Nunes**: for building [Spectrum Computing](https://spectrumcomputing.co.uk/) that hosts the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) (and also providing inumerous other contributions to ZXDB content);
 
