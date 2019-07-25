@@ -25,6 +25,10 @@ There's also an optional script to create auxiliary tables, that can be used to 
 
 * `scripts/ZXDB_help_search.sql` - Script to create auxiliary tables prefixed with `search_by_`
 
+Finally there's a script for health checking, that validates ZXDB consistency rules that cannot be enforced by check constraints:
+
+* `scripts/ZXDB_health_check.sql` - Script to identify data inconsistencies in ZXDB
+
 
 ## Database model
 

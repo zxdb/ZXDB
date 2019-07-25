@@ -60,12 +60,17 @@ create table search_by_publishers (
 insert into search_by_publishers(label_id, entry_id) (select lid, eid from (select x.label_id as lid, x.entry_id as eid from publishers x union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on l2.id = l1.from_id or l2.id = l1.owner_id union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on (l1.id = l2.from_id or l1.id = l2.owner_id) and (l2.labeltype_id is null or l2.labeltype_id in ('+','-'))) as y where lid is not null group by lid, eid order by lid, eid);
 
 
--- Examples
-
+-- Example: Search for all entries with title similar to "sokoban"
 select * from entries where id in (select entry_id from search_by_titles where entry_title like '%sokoban%') order by title;
+
+-- Example: Search for all labels (person or company) with name similar to "zxsoft"
 select * from labels where id in (select label_id from search_by_names where label_name like '%zxsoft%') order by name;
-select * from entries where id in (select entry_id from search_by_authors a inner join search_by_names n on a.label_id = n.label_id where label_name like '%joffa%') order by title; -- Joffa
-select * from entries where id in (select entry_id from search_by_publishers p inner join search_by_names n on p.label_id = n.label_id where label_name like '%zxsoftbr%') order by title; -- ZX-SOFT Brasil Ltda
+
+-- Example: Search for all entries authored by someone with name similar to "joffa"
+select * from entries where id in (select entry_id from search_by_authors a inner join search_by_names n on a.label_id = n.label_id where label_name like '%joffa%') order by title;
+
+-- Example: Search for all entries published by someone with name similar to "zxsoftbr"
+select * from entries where id in (select entry_id from search_by_publishers p inner join search_by_names n on p.label_id = n.label_id where label_name like '%zxsoftbr%') order by title;
 
 
 -- END
