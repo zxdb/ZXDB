@@ -35,6 +35,12 @@ select * from (
         select e.id, e.title, '', 'books require ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
     union all
         select e.id, e.title, '', 'hardwares require ID above 1000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Hardware%' and e.id not between 1000000 and 1999999
+    union all
+        select e.id, e.title, t.text, 'program not identified as Timex with ID above 4000000' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
+    union all
+        select e.id, e.title, g.text, 'title not identified as book with ID above 2000000' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
+    union all
+        select e.id, e.title, g.text, 'title not identified as hardware with ID above 1000000' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
 ) as errors order by entry_id;
 
 -- END
