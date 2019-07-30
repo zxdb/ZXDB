@@ -57,7 +57,7 @@ create table search_by_publishers (
     index (entry_id)
 );
 
-insert into search_by_publishers(label_id, entry_id) (select lid, eid from (select x.label_id as lid, x.entry_id as eid from publishers x union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on l2.id = l1.from_id or l2.id = l1.owner_id union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on (l1.id = l2.from_id or l1.id = l2.owner_id) and (l2.labeltype_id is null or l2.labeltype_id in ('+','-'))) as y where lid is not null group by lid, eid order by lid, eid);
+insert into search_by_publishers(label_id, entry_id) (select lid, eid from (select x.label_id as lid, x.entry_id as eid from publishers x union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on l2.id = l1.from_id or l2.id = l1.owner_id union all select l2.id as lid, x.entry_id as eid from publishers x inner join labels l1 on x.label_id = l1.id inner join labels l2 on (l1.id = l2.from_id or l1.id = l2.owner_id) and (l2.labeltype_id is null or l2.labeltype_id in ('+','-')) union all select label_id, compilation_id from compilations where label_id is not null) as y where lid is not null group by lid, eid order by lid, eid);
 
 
 -- Example: Search for all entries with title similar to "sokoban"
