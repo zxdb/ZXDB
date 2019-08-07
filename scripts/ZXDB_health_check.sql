@@ -4,7 +4,7 @@
 USE zxdb;
 
 select * from (
-        select a.entry_id, e.title, a.author_seq-1 as details,'skipped an author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
+        select a.entry_id, e.title, a.author_seq-1 as details, 'skipped an author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
         select id, title, '0', 'missing a release number in releases' from entries where id not in (select entry_id from releases)
     union all
@@ -55,6 +55,8 @@ select * from (
         select null, null, concat(m.name,' #',i1.number), 'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'')
     union all
         select null, null, concat(m.name,' ',i1.date_year,'/',i1.date_month), 'duplicated magazine issue' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number is null and i2.number is null and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.date_year,-1) = coalesce(i2.date_year,-1) and coalesce(i1.date_month,-1) = coalesce(i2.date_month,-1) and coalesce(i1.date_day,-1) = coalesce(i2.date_day,-1)
-) as errors order by entry_id;
+    union all
+        select null, null, name, 'available magazine without any catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
+) as errors order by entry_id, details;
 
 -- END
