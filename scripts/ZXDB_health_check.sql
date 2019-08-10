@@ -30,17 +30,17 @@ select * from (
     union all
          select e.id, e.title, concat(b.name,' / ',t.name), 'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
-        select e.id, e.title, t.text, 'timex programs require ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
+        select e.id, e.title, t.text, 'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
     union all
-        select e.id, e.title, g.text, 'books require ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
+        select e.id, e.title, g.text, 'books should have ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
     union all
-        select e.id, e.title, g.text, 'hardware devices require ID above 1000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Hardware%' and e.id not between 1000000 and 1999999
+        select e.id, e.title, g.text, 'hardware devices should have ID above 1000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Hardware%' and e.id not between 1000000 and 1999999
     union all
-        select e.id, e.title, t.text, 'title with ID above 4000000 must be a timex program' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
+        select e.id, e.title, t.text, 'title with ID above 4000000 that is not timex program' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
     union all
-        select e.id, e.title, g.text, 'title with ID above 2000000 must be a book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
+        select e.id, e.title, g.text, 'title with ID above 2000000 that is not book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
     union all
-        select e.id, e.title, g.text, 'title with ID above 1000000 must be a hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
+        select e.id, e.title, g.text, 'title with ID above 1000000 that is not hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
     union all
         select e.id, e.title, d.file_link, 'unknown file extension' from downloads d inner join entries e on d.entry_id = e.id left join extensions x on d.file_link like CONCAT('%',x.ext) where x.ext is null and d.file_link not like 'http%' and d.file_link not like '%.zip' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '%_SourceCode.tar.bz2'
     union all
@@ -56,7 +56,8 @@ select * from (
     union all
         select null, null, concat(m.name,' ',i1.date_year,'/',i1.date_month), 'duplicated magazine issue' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number is null and i2.number is null and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.date_year,-1) = coalesce(i2.date_year,-1) and coalesce(i1.date_month,-1) = coalesce(i2.date_month,-1) and coalesce(i1.date_day,-1) = coalesce(i2.date_day,-1)
     union all
-        select null, null, name, 'available magazine without any catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
+        select null, null, concat(name,' (',id,')'), 'available magazine without catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
+    union all
+        select id, title, mag_issue, 'title is apparently not a magazine issue' from (select e.id, e.title, i.number, replace(replace(replace(replace(m.name,'ACE (Advanced Computer Entertainment)','ACE'),'Sinclair User Club-DE','Sinclair User Club'),'Your Computer-ES','Your Computer'),'16-48 Magazine','16/48 Magazine Tape') as mag_name, concat(m.name,' #',coalesce(i.number,'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?')) as mag_issue from entries e inner join issues i on i.id = e.issue_id inner join magazines m on i.magazine_id = m.id) as x where not (title = mag_name or title = CONCAT(mag_name,' ',number) or title = CONCAT(mag_name,' 0',number) or title = CONCAT(mag_name,' No ',number) or title = CONCAT(mag_name,' No 0',number) or lower(title) = lower(CONCAT(mag_name,' Nr 0',number)) or lower(title) = lower(CONCAT(mag_name,' issue ',number)) or lower(title) = lower(CONCAT(mag_name,' issue 0',number)) or lower(title) = lower(CONCAT(mag_name,' issue 00',number)) or title like CONCAT(mag_name,' issue 0',number,':%') or title like CONCAT(mag_name,' issue ',number,':%') or title like CONCAT(mag_name,' issue 0',number,' -%'))
 ) as errors order by entry_id, details;
-
 -- END
