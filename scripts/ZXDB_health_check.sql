@@ -14,11 +14,11 @@ select * from (
     union all
          select e.id, e.title, concat(c.tape_seq,'-',c.tape_side,'-',c.prog_seq-1), 'skipped an item in compilation' from compilations c inner join entries e on c.compilation_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from compilations c2 where c2.compilation_id = c.compilation_id and c2.tape_seq = c.tape_seq and c2.tape_side = c.tape_side)
     union all
-         select m.entry_id, e.title, g.name, 'missing a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.grouptype_id = 'S'
+         select m.entry_id, e.title, concat(g.name,' (',g.id,')'), 'missing a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.grouptype_id = 'S'
     union all
-         select m.entry_id, e.title, g.name, 'skipped a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.group_id = m.group_id)
+         select m.entry_id, e.title, concat(g.name,' (',g.id,')'), 'skipped a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.group_id = m.group_id)
     union all
-         select m.entry_id, e.title, g.name, 'invalid sequence number in group that is not series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.grouptype_id <> 'S'
+         select m.entry_id, e.title, concat(g.name,' (',g.id,')'), 'invalid sequence number in group that is not series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.grouptype_id <> 'S'
     union all
          select p.entry_id, e.title, p.publisher_seq-1, 'skipped a publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
