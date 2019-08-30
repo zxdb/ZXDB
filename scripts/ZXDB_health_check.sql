@@ -67,5 +67,8 @@ select * from (
         select null, null, concat(t.text,': ',name,' (',g.id,')'), 'group without any members' from groups g inner join grouptypes t on t.id = g.grouptype_id where g.id not in (select group_id from members)
     union all
         select e.id, e.title, t.text, 'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
+    union all
+        select e.id, e.title, t.text, 'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
 ) as errors order by entry_id, details;
+
 -- END
