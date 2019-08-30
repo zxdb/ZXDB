@@ -65,5 +65,7 @@ select * from (
         select e.id, e.title, d.file_link, 'file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
     union all
         select null, null, concat(t.text,': ',name,' (',g.id,')'), 'group without any members' from groups g inner join grouptypes t on t.id = g.grouptype_id where g.id not in (select group_id from members)
+    union all
+        select e.id, e.title, t.text, 'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
 ) as errors order by entry_id, details;
 -- END
