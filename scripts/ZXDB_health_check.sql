@@ -69,6 +69,10 @@ select * from (
         select e.id, e.title, t.text, 'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
     union all
         select e.id, e.title, t.text, 'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
+    union all
+        select e.id, e.title, e.comments, 'programs in compilation must be indexed properly' from entries e where comments like '[%+%]'
+    union all
+        select e.id, e.title, e.spot_comments, 'programs in compilation must be indexed properly' from entries e where spot_comments like '[%+%]'
 ) as errors order by entry_id, details;
 
 -- END
