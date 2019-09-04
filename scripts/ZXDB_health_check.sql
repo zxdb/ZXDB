@@ -63,5 +63,12 @@ select * from (
         select null, null, concat(k.magref_id,' - ',k.link), 'mismatch between magazine reference link and host' from magreflinks k inner join hosts h on k.host_id = h.id where k.link not like concat(h.link, '%')
     union all
         select e.id, e.title, d.file_link, 'file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
+    union all
+        select null, null, concat(t.text,': ',name,' (',g.id,')'), 'group without any members' from groups g inner join grouptypes t on t.id = g.grouptype_id where g.id not in (select group_id from members)
+    union all
+        select e.id, e.title, t.text, 'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
+    union all
+        select e.id, e.title, t.text, 'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
 ) as errors order by entry_id, details;
+
 -- END

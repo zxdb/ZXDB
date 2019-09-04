@@ -298,13 +298,15 @@ The following websites are fully integrated with ZXDB:
 
 * [Spectrum 2.0](http://spectrum20.zxdemo.org/) - Each ZXDB title links to the corresponding webpage at **Philip Kendall**'s site.
 
-* [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZXDB title links to the corresponding webpage at **Simon Holdsworth**'s site.
+* [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZX81 title in ZXDB links to the corresponding webpage at **Simon Holdsworth**'s site.
+
+* [JSW Central](https://jswcentral.org/) - Each JetSetWilly mod in ZXDB links to the corresponding webpage at **Daniel Gromann**'s site.
 
 * [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia
 
 * [MobyGames](http://www.mobygames.com/) - Each ZXDB title links to the corresponding webpage at MobyGames.
 
-* [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each ZXDB title links to the corresponding webpage at C.A.S.A.
+* [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at C.A.S.A.
 
 * [Lost in Translation](http://www.exotica.org.uk/) - Each ZXDB title links to the corresponding webpage at Lost in Translation.
 
