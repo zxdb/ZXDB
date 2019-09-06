@@ -73,6 +73,8 @@ select * from (
         select e.id, e.title, e.comments, 'programs in compilation must be indexed properly' from entries e where comments like '[%+%]'
     union all
         select e.id, e.title, e.spot_comments, 'programs in compilation must be indexed properly' from entries e where spot_comments like '[%+%]'
+    union all
+        select null, null, concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'), 'possibly duplicated groups with same elements' from groups g1 inner join groups g2 on g1.id < g2.id left join members m1 on m1.group_id = g1.id and m1.entry_id not in (select entry_id from members where group_id = g2.id) left join members m2 on m2.group_id = g2.id and m2.entry_id not in (select entry_id from members where group_id = g1.id) where m1.entry_id is null and m2.entry_id is null and g1.id in (select group_id from members)
 ) as errors order by entry_id, details;
 
 -- END
