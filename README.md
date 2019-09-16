@@ -21,6 +21,14 @@ Optionally you can execute one of the provided scripts to convert file `ZXDB_mys
 
 * `scripts/ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
 
+The ZXDB distribution doesn't include links to [RZX Archive](http://www.rzxarchive.co.uk/) because they are updated independently. There's a separate script to import these links into ZXDB:
+
+* `scripts/ZXDB_import_rzx.sql` - Script to import [RZX Archive](http://www.rzxarchive.co.uk/) links from file [RZXArchiveZXDB.txt](https://spectrumcomputing.co.uk/RZXArchiveZXDB.txt)
+
+The ZXDB distribution doesn't include links to [Speccy Screenshot Maps](http://maps.speccy.cz/) either, because they are updated independently too. There's another separate script to import these links into ZXDB:
+
+* `scripts/ZXDB_import_mapy.sql` - Script to import [Speccy Screenshot Maps](http://maps.speccy.cz/) links from file [mapy.txt](https://maps.speccy.cz/mapy.txt)
+
 There's also an optional script to create auxiliary tables, that can be used to help database searches. Ideally these tables must be repopulated whenever ZXDB content changes, or defined as materialized views in a RDBMS that supports it:
 
 * `scripts/ZXDB_help_search.sql` - Script to create auxiliary tables prefixed with `search_by_`
