@@ -21,11 +21,11 @@ Optionally you can execute one of the provided scripts to convert file `ZXDB_mys
 
 * `scripts/ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
 
-The ZXDB distribution doesn't include links to [RZX Archive](http://www.rzxarchive.co.uk/) because they are updated independently. There's a separate script to import these links into ZXDB:
+The ZXDB distribution already includes all links to [RZX Archive](http://www.rzxarchive.co.uk/), but these links can also be updated independently. There's a separate script to import these links into ZXDB:
 
 * `scripts/ZXDB_import_rzx.sql` - Script to import [RZX Archive](http://www.rzxarchive.co.uk/) links from file [RZXArchiveZXDB.txt](https://spectrumcomputing.co.uk/RZXArchiveZXDB.txt)
 
-The ZXDB distribution doesn't include links to [Speccy Screenshot Maps](http://maps.speccy.cz/) either, because they are updated independently too. There's another separate script to import these links into ZXDB:
+The ZXDB distribution already includes all links to [Speccy Screenshot Maps](http://maps.speccy.cz/), but these links can also be updated independently. There's another separate script to import these links into ZXDB:
 
 * `scripts/ZXDB_import_mapy.sql` - Script to import [Speccy Screenshot Maps](http://maps.speccy.cz/) links from file [mapy.txt](https://maps.speccy.cz/mapy.txt)
 
