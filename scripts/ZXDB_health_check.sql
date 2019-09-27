@@ -79,6 +79,8 @@ select * from (
         select e.id,e.title,d.file_link,'download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%'
     union all
         select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
+    union all
+        select null, null, name, 'nickname should be owned instead of renamed' from labels where (from_id is not null or was_renamed = 1) and labeltype_id = '-'
 ) as errors order by entry_id, details;
 
 -- END
