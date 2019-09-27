@@ -80,7 +80,11 @@ select * from (
     union all
         select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
     union all
-        select null, null, name, 'nickname should be owned instead of renamed' from labels where (from_id is not null or was_renamed = 1) and labeltype_id = '-'
+        select null, null, name, 'person cannot have owner' from labels where owner_id is not null and labeltype_id = '+'
+    union all
+        select null, null, name, 'person cannot be inherited' from labels where from_id is not null and was_renamed = 0 and labeltype_id = '+'
+    union all
+        select null, null, name, 'nickname cannot be inherited or renamed' from labels where (from_id is not null or was_renamed = 1) and labeltype_id = '-'
 ) as errors order by entry_id, details;
 
 -- END
