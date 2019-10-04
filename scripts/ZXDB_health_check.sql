@@ -85,6 +85,8 @@ select * from (
         select null, null, name, 'person cannot be inherited' from labels where from_id is not null and was_renamed = 0 and labeltype_id = '+'
     union all
         select null, null, name, 'nickname cannot be inherited or renamed' from labels where (from_id is not null or was_renamed = 1) and labeltype_id = '-'
+    union all
+        select id,title,library_title,'library title should not start with article "The"' from entries where library_title like 'The %'
 ) as errors order by entry_id, details;
 
 -- END
