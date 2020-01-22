@@ -68,7 +68,7 @@ The ZXDB schema is described below:
 * `tools` - Spectrum-related cross-platform utilities and development tools (emulators, compilers, editors, etc)
 
 * `websites` - main websites that provide information about items (WorldOfSpectrum, Tipshop, Wikipedia, etc). The website link mask follows this convention:
-  * `{eN}` - entry ID, with (at least) N digits
+  * `{e#}` - entry ID, with (at least) # digits
 
 
 #### _SECONDARY TABLES_
