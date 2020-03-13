@@ -91,6 +91,10 @@ select * from (
         select e.id,e.title,g.name,'CSSCGC title missing from compilation' from entries e inner join members m on m.entry_id = e.id inner join groups g on g.id = m.group_id and g.name like 'CSSCGC Crap Games Contest%' left join entries k on k.title like 'CSSCGC Crap Games Competition%' and e.id <> k.id left join compilations c on c.compilation_id = k.id and c.entry_id = e.id where k.title = concat('CSSCGC Crap Games Competition',right(g.name,5)) and c.entry_id is null
     union all
         select e.id,e.title,k.title,'CSSCGC title missing from contest' from entries e inner join compilations c on c.entry_id = e.id inner join entries k on k.id = c.compilation_id and k.title like 'CSSCGC Crap Games Competition%' left join groups g on g.name like 'CSSCGC Crap Games Contest%' and g.name = concat('CSSCGC Crap Games Contest',right(k.title,5)) left join members m on g.id = m.group_id and m.entry_id = e.id where m.entry_id is null
+    union all
+         select e.id,e.title,g.text,'software must be bundled with hardware or book (not the opposite)' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'w' and e.id between 1000000 and 2999999 and r.original_id not between 1000000 and 2999999
+    union all
+         select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
 ) as errors order by entry_id, details;
 
 -- END
