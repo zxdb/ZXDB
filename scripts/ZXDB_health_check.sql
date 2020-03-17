@@ -95,6 +95,8 @@ select * from (
          select e.id,e.title,g.text,'software must be bundled with hardware or book (not the opposite)' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'w' and e.id between 1000000 and 2999999 and r.original_id not between 1000000 and 2999999
     union all
          select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
+    union all
+        select e.id,e.title,x.file_link,'non-historical file archived' from extras x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
 ) as errors order by entry_id, details;
 
 -- END
