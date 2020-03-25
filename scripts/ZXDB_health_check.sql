@@ -97,6 +97,10 @@ select * from (
          select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
     union all
         select e.id,e.title,x.file_link,'non-historical file archived' from extras x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
+    union all
+        select null, null, concat('"',name,'"'), 'label with extra spaces' from labels where name like '% ' or name like ' %' or name like '%  %'
+    union all
+        select id, concat('"',title,'"'), concat('"',library_title,'"'), 'title with extra spaces' from entries where title like '% ' or title like ' %' or title like '%  %' or library_title like '% ' or library_title like ' %' or library_title like '%  %'
 ) as errors order by entry_id, details;
 
 -- END
