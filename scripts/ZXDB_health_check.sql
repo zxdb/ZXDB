@@ -101,6 +101,8 @@ select * from (
         select null, null, concat('"',name,'"'), 'label with extra spaces' from labels where name like '% ' or name like ' %' or name like '%  %'
     union all
         select id, concat('"',title,'"'), concat('"',library_title,'"'), 'title with extra spaces' from entries where title like '% ' or title like ' %' or title like '%  %' or library_title like '% ' or library_title like ' %' or library_title like '%  %'
+    union all
+        select e.id,e.title,g.text,'entry linked to magazine must be Covertape or Electronic Magazine' from entries e left join genretypes g on e.genretype_id = g.id where e.issue_id is not null and e.title not like 'DigiTape%' and (e.genretype_id is null or e.genretype_id not in (81,82))
 ) as errors order by entry_id, details;
 
 -- END
