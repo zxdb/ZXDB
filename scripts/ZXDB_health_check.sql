@@ -103,6 +103,8 @@ select * from (
         select id, concat('"',title,'"'), concat('"',library_title,'"'), 'title with extra spaces' from entries where title like '% ' or title like ' %' or title like '%  %' or library_title like '% ' or library_title like ' %' or library_title like '%  %'
     union all
         select e.id,e.title,g.text,'entry linked to magazine must be Covertape or Electronic Magazine' from entries e left join genretypes g on e.genretype_id = g.id where e.issue_id is not null and e.title not like 'DigiTape%' and (e.genretype_id is null or e.genretype_id not in (81,82))
+    union all
+        select e.id,e.title,concat(b2.name,' / ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where b1.owner_id = b2.id
 ) as errors order by entry_id, details;
 
 -- END
