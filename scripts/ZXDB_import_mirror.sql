@@ -22,7 +22,7 @@ select * from extras where file_link like '/pub/%' and file_link not in (select 
 select * from labelfiles where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) order by file_link;
 select * from magfiles where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) order by file_link;
 
-select * from tmp_mirror where file_link not in (select file_link from downloads) and file_link not in (select file_link from extras where file_link is not null) and file_link not in (select file_link from labelfiles) and file_link not in (select file_link from magfiles) and file_link not like '/pub/sinclair/magazines/%' order by file_link;
+select * from tmp_mirror where file_link not in (select file_link from downloads) and file_link not in (select file_link from extras where file_link is not null) and file_link not in (select file_link from labelfiles) and file_link not in (select file_link from magfiles) and file_link not in (select file_link from toolfiles) and file_link not like '/pub/sinclair/magazines/%' order by file_link;
 
 drop table tmp_mirror;
 

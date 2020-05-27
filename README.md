@@ -121,7 +121,11 @@ The ZXDB schema is described below:
 
 * `licensors` - associate licenses to their license owners
 
-* `magrefs` - associate entries or labels to pages from magazine issues about them
+* `magrefs` - associate entries or labels to pages from magazine issues about them (magazine references)
+
+* `magreflinks` - associate magazine references to links about them
+
+* `magreffeats` - associate magazine references to features
 
 * `members` - associate groups to their list of programs
   * `series_seq` - only required for sequenced series

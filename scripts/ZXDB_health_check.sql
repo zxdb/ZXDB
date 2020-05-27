@@ -90,29 +90,31 @@ select * from (
     union all
          select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
     union all
-        select e.id,e.title,x.file_link,'non-historical file archived' from extras x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
+        select e.id,e.title,x.file_link,'archived non-historical file' from extras x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
     union all
-        select null, null, concat('"',name,'"'), 'label with extra spaces' from labels where name like '% ' or name like ' %' or name like '%  %'
-    union all
-        select id, concat('"',title,'"'), concat('"',library_title,'"'), 'title with extra spaces' from entries where title like '% ' or title like ' %' or title like '%  %' or library_title like '% ' or library_title like ' %' or library_title like '%  %'
+        select null,null,d.file_link,'archived file in use' from extras x inner join downloads d where x.file_link = d.file_link
     union all
         select e.id,e.title,g.text,'entry linked to magazine must be Covertape or Electronic Magazine' from entries e left join genretypes g on e.genretype_id = g.id where e.issue_id is not null and e.title not like 'DigiTape%' and (e.genretype_id is null or e.genretype_id not in (81,82))
     union all
         select e.id,e.title,concat(b2.name,' / ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where b1.owner_id = b2.id
     union all
-        select id, title, replace(replace(title, ' ', '%'), '–', '%'), 'invalid character in entries.title' from entries where title like '% %' or title like '%–%'
+        select id,title,replace(replace(title, ' ', '%'), '–', '%'),'invalid character in entries.title' from entries where title like '% %' or title like '%–%'
     union all
-        select id, library_title, replace(replace(library_title, ' ', '%'), '–', '%'), 'invalid character in entries.library_title' from entries where library_title like '% %' or library_title like '%–%'
+        select id,library_title,replace(replace(library_title, ' ', '%'), '–', '%'),'invalid character in entries.library_title' from entries where library_title like '% %' or library_title like '%–%'
     union all
-        select entry_id, title, replace(replace(title, ' ', '%'), '–', '%'), 'invalid character in aliases.title' from aliases where title like '% %' or title like '%–%'
+        select entry_id,title,replace(replace(title, ' ', '%'), '–', '%'),'invalid character in aliases.title' from aliases where title like '% %' or title like '%–%'
     union all
-        select entry_id, library_title, replace(library_title, ' ', '%'), 'invalid character in aliases.library_title' from aliases where library_title like '% %' or library_title like '%–%'
+        select entry_id,library_title,replace(library_title, ' ', '%'),'invalid character in aliases.library_title' from aliases where library_title like '% %' or library_title like '%–%'
     union all
-        select id, title, replace(replace(comments, ' ', '%'), '–', '%'), 'invalid character in entries.comments' from entries where comments like '% %' or comments like '%–%'
+        select id,title,replace(replace(comments, ' ', '%'), '–', '%'),'invalid character in entries.comments' from entries where comments like '% %' or comments like '%–%'
     union all
-        select id, title, replace(replace(spot_comments, ' ', '%'), '–', '%'), 'invalid character in entries.spot_comments' from entries where spot_comments like '% %' or spot_comments like '%–%'
+        select id,title,replace(replace(spot_comments, ' ', '%'), '–', '%'),'invalid character in entries.spot_comments' from entries where spot_comments like '% %' or spot_comments like '%–%'
     union all
-        select null, null, replace(name, ' ', '%'), 'invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
+        select null,null,replace(name, ' ', '%'),'invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
+    union all
+        select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
+    union all
+         select null,null,concat('/zxdb/sinclair/entries/.../',filename),'duplicated filename' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
 ) as errors order by entry_id, details;
 
 -- END

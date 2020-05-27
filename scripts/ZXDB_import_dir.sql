@@ -16,11 +16,13 @@ select * from downloads where file_link like '/zxdb/%' and file_link not in (sel
 select * from magfiles where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 select * from labelfiles where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 select * from extras where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
+select * from toolfiles where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 
-update downloads d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_size is null;
-update magfiles d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_size is null;
-update labelfiles d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_size is null;
-update extras d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_size is null;
+update downloads d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
+update magfiles d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
+update labelfiles d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
+update extras d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
+update toolfiles d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
 
 drop table tmp_dir;
 
