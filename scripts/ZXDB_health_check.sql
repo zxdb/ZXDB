@@ -74,6 +74,8 @@ select * from (
     union all
         select e.id,e.title,e.spot_comments,'programs in compilation must be indexed properly' from entries e where spot_comments like '[%+%]'
     union all
+        select e.id,e.title,d.file_link,'possibly demo file not marked as demonstration' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
+    union all
         select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated groups with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
     union all
         select e.id,e.title,d.file_link,'download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%'
@@ -111,6 +113,8 @@ select * from (
         select id,title,replace(replace(spot_comments, ' ', '%'), '–', '%'),'invalid character in entries.spot_comments' from entries where spot_comments like '% %' or spot_comments like '%–%'
     union all
         select null,null,replace(name, ' ', '%'),'invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
+    union all
+        select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
         select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
     union all
