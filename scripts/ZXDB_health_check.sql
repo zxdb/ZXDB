@@ -68,11 +68,23 @@ select * from (
     union all
         select e.id,e.title,t.text,'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
     union all
+        select e.id,e.title,t.text,'published program without magazine or book reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'T' and e.id not in (select entry_id from magrefs where referencetype_id = 0) and e.id not in (select entry_id from booktypeins) 
+    union all
+        select e.id,e.title,t.text,'published program without covertape reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'M' and e.id not in (select c.entry_id from compilations c inner join entries k on c.compilation_id = k.id where c.entry_id is not null and k.genretype_id in (81,82))
+    union all
+        select e.id,e.title,t.text,'published program without compilation reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'C' and e.id not in (select entry_id from compilations where entry_id is not null)
+    union all
         select e.id,e.title,t.text,'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
     union all
-        select e.id,e.title,e.comments,'programs in compilation must be indexed properly' from entries e where comments like '[%+%]'
+        select id,title,comments,'programs in compilation must be indexed properly' from entries where comments like '[%+%]'
     union all
-        select e.id,e.title,e.spot_comments,'programs in compilation must be indexed properly' from entries e where spot_comments like '[%+%]'
+        select id,title,spot_comments,'programs in compilation must be indexed properly' from entries where spot_comments like '[%+%]'
+    union all
+        select id,title,comments,'aliases must be indexed properly' from entries where comments like 'aka. %'
+    union all
+        select id,title,spot_comments,'aliases must be indexed properly' from entries where spot_comments like 'aka. %'
+    union all
+        select id,title,comments,'derived versions must be indexed properly' from entries where comments like 'An updated version of %' and id not in (select entry_id from relations where relationtype_id = 'u')
     union all
         select e.id,e.title,d.file_link,'possibly demo file not marked as demonstration' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
     union all
