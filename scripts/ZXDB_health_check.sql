@@ -28,6 +28,10 @@ select * from (
     union all
          select e.id,e.title,g.text,'game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
+         select null,null,b1.name,'possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null
+    union all
+         select e1.id,e1.title,null,'possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
+    union all
          select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
         select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
@@ -83,6 +87,8 @@ select * from (
         select id,title,comments,'aliases must be indexed properly' from entries where comments like 'aka. %'
     union all
         select id,title,spot_comments,'aliases must be indexed properly' from entries where spot_comments like 'aka. %'
+    union all
+        select id,title,comments,'comments pending revision' from entries where coalesce(comments,'') <> replace(coalesce(comments,''),'\\ ',' ')
     union all
         select id,title,comments,'derived versions must be indexed properly' from entries where comments like 'An updated version of %' and id not in (select entry_id from relations where relationtype_id = 'u')
     union all

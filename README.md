@@ -2,7 +2,7 @@
 
 ZXDB is an open database containing historical information of software, hardware, magazines and books about ZX-Spectrum and related machines.
 
-It was created by **Einar Saukas**, from the full content of **Martijn van der Heide**'s [WorldOfSpectrum](http://www.worldofspectrum.org/) and **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) archives (both imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
+It was created by **Einar Saukas**, from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) and **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) archives (both imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
 
 For further details, visit the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) at [Spectrum Computing](https://spectrumcomputing.co.uk/).
 
@@ -67,7 +67,7 @@ The ZXDB schema is described below:
 
 * `tools` - Spectrum-related cross-platform utilities and development tools (emulators, compilers, editors, etc)
 
-* `websites` - main websites that provide information about items (WorldOfSpectrum, Tipshop, Wikipedia, etc). The website link mask follows this convention:
+* `websites` - main websites that provide information about items (MobyGames, Tipshop, Wikipedia, etc). The website link mask follows this convention:
   * `{e#}` - entry ID, with (at least) # digits
 
 
@@ -77,9 +77,11 @@ The ZXDB schema is described below:
 
 * `downloads` - available material related to a specific entry/release (screenshot, tape image, inlay, map, instructions, etc)
 
-* `extras` - obsolete WorldOfSpectrum files, and additional files unrelated to entries or labels (FAQ, AY music, etc)
+* `extras` - obsolete files from the Original WorldOfSpectrum, and additional files unrelated to entries or labels (FAQ, AY music, etc)
 
 * `features` - magazine sections that featured certain entry or label references
+
+* `files` - available material related to a label (photos, posters, advertisements, etc), magazine issue (electronic magazine files, printed magazine scans, covertape music, etc), or cross-platform tool (installation files, instructions, etc)
 
 * `groups` - each group of programs with similar characteristics (participants in the same competition, based on the same original game, etc)
 
@@ -222,9 +224,9 @@ The ZXDB schema is described below:
 
 #### _ADDITIONAL DETAILS_
 
-Tables prefixed with `spex_` contain information from SPOT/SPEX archive that differs from original WorldOfSpectrum archive, thus pending further investigation later.
+Tables prefixed with `spex_` contain information from SPOT/SPEX archive that differs from the Original WorldOfSpectrum archive, thus pending further investigation later.
 
-Local file links starting with `/pub/sinclair/` refer to content previously available at the original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
+Local file links starting with `/pub/sinclair/` refer to content previously available at the Original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
 
 Local file links starting with `/zxdb/sinclair/` refer to content added afterwards. These files are currently stored at https://spectrumcomputing.co.uk/zxdb/sinclair/
 
@@ -271,15 +273,15 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 Also special thanks to everyone that contributed to the creation of ZXDB, particularly:
 
-* **Martijn van der Heide**: for creating and maintaining the original [WorldOfSpectrum](http://www.worldofspectrum.org/) archive, and directly helping to import it into ZXDB (clarifying our trickiest questions about the most obscure flags in [WorldOfSpectrum](http://www.worldofspectrum.org/) internal files).
+* **Martijn van der Heide**: for creating and maintaining the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive, and directly helping to import it into ZXDB (clarifying our trickiest questions about the most obscure flags in the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) internal files).
 
 * **Jim Grimwood**: for creating and maintaining the original [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) archive.
 
-* **Gerard Sweeney**: for invaluable assistance on importing all original content from the original [WorldOfSpectrum](http://www.worldofspectrum.org/) archive.
+* **Gerard Sweeney**: for invaluable assistance on importing all original content from the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive.
 
 * **AndyC**: for reviewing the ZXDB schema, and implementing both SQL Server and SQLite converters.
 
-* **Lee Fogarty**: for providing full access to internal files from the original [WorldOfSpectrum](http://www.worldofspectrum.org/) archive and declaring them as "open source".
+* **Lee Fogarty**: for providing full access to internal files from Martijn's [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive and declaring them as "open source".
 
 
 ## References
@@ -290,15 +292,17 @@ The following websites directly use ZXDB internally:
 
 * [ZXInfo](https://zxinfo.dk/) - ZX-Spectrum archive based on ZXDB, built with ElasticSearch by **Thomas Kolbeck**.
 
-* [Lisias' Raspberry Pi](http://service.retro.lisias.net/db/) - ZX-Spectrum search engine based on ZXDB, built on Raspberry Pi by **Lisias Toledo**.
+* [ZXInfo API](https://api.zxinfo.dk/) - Open ZXDB API, provided by **Thomas Kolbeck**.
 
 * [ZX-Spectrum Reviews (ZXSR)](http://zxspectrumreviews.co.uk/) - ZX-Spectrum Reviews archive by **Chris Bourne**, it now runs ZXSR database integrated with ZXDB.
 
 * [ZX-Art](https://zxart.ee/) - ZX-Spectrum art archive by **Dmitri Ponomarjov**, it includes content imported periodically from ZXDB.
 
-* [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) - Tool for organizing ZX-Spectrum files by **Helga Iliashenko**, it includes content imported periodically from ZXDB.
+* [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) - Tool for organizing ZX-Spectrum files by **Elia Iliashenko**, it includes content imported periodically from ZXDB.
 
-* [ZXInfo API](https://api.zxinfo.dk/) - Open ZXDB API, provided by **Thomas Kolbeck**.
+* [Lisias' Raspberry Pi](http://service.retro.lisias.net/db/) - ZX-Spectrum search engine based on ZXDB, built on Raspberry Pi by **Lisias Toledo**.
+
+* [New WorldOfSpectrum](https://worldofspectrum.org/) - ZX-Spectrum archive rebuilt by **Lee Fogarty**, it was launched in June 2020 although using ZXDB version 1.08 from September 2018.
 
 The following websites are fully integrated with ZXDB:
 
@@ -312,7 +316,9 @@ The following websites are fully integrated with ZXDB:
 
 * [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZX81 title in ZXDB links to the corresponding webpage at **Simon Holdsworth**'s site.
 
-* [JSW Central](https://jswcentral.org/) - Each JetSetWilly mod in ZXDB links to the corresponding webpage at **Daniel Gromann**'s site.
+* [WorldOfSAM](https://www.worldofsam.org/) - Each SAM Coupe title in ZXDB links to the corresponding webpage at **Andrew Collier**'s site.
+
+* [JSW Central](https://jswcentral.org/) - Each Jet Set Willy mod in ZXDB links to the corresponding webpage at **Daniel Gromann**'s site.
 
 * [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia
 
@@ -326,7 +332,7 @@ The following websites are fully integrated with ZXDB:
 
 * [The Tipshop](http://www.the-tipshop.co.uk/) - Each ZXDB title links to the corresponding webpage at **Gerard Sweeney**'s site.
 
-* [WorldOfSpectrum](http://www.worldofspectrum.org/) - Each ZXDB title links to the corresponding webpage at **Martijn van der Heide**'s site.
+* [Original WorldOfSpectrum](http://www.worldofspectrum.org/) - Each ZXDB title still links to the corresponding archived webpage of **Martijn van der Heide**'s site.
 
 * [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) - Each ZXDB magazine reference links to the corresponding webpage at **Jim Grimwood**'s site.
 
