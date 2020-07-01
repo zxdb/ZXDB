@@ -77,7 +77,7 @@ The ZXDB schema is described below:
 
 * `downloads` - available material related to a specific entry/release (screenshot, tape image, inlay, map, instructions, etc)
 
-* `extras` - obsolete files from the Original WorldOfSpectrum, and additional files unrelated to entries or labels (FAQ, AY music, etc)
+* `extras` - lost files unrelated to entries or labels (FAQ, AY music, etc)
 
 * `features` - magazine sections that featured certain entry or label references
 
@@ -104,6 +104,8 @@ The ZXDB schema is described below:
 * `remakes` - modern remakes of Spectrum programs
 
 * `scores` - average score received by each entry at main websites
+
+* `scraps` - obsolete files from the Original WorldOfSpectrum
 
 * `toolfiles` - installation files of cross-platform utilities and development tools
 

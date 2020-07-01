@@ -90,7 +90,11 @@ select * from (
     union all
         select id,title,comments,'comments pending revision' from entries where coalesce(comments,'') <> replace(coalesce(comments,''),'\\ ',' ')
     union all
+        select id,title,comments,'comments referencing old WoS website' from entries where comments like '%infoseek%'
+    union all
         select id,title,comments,'derived versions must be indexed properly' from entries where comments like 'An updated version of %' and id not in (select entry_id from relations where relationtype_id = 'u')
+    union all
+        select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from compilations where entry_id is not null) or id in (select compilation_id from compilations) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations) or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs))
     union all
         select e.id,e.title,d.file_link,'possibly demo file not marked as demonstration' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
     union all
