@@ -100,7 +100,7 @@ select * from (
     union all
         select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated groups with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
     union all
-        select e.id,e.title,d.file_link,'download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%'
+        select e.id,e.title,d.file_link,'download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%.pok'
     union all
         select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
     union all

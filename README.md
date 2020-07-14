@@ -91,11 +91,7 @@ The ZXDB schema is described below:
 
 * `issues` - each published issue of a magazine
 
-* `labelfiles` - available material related to a specific label (photos, posters, advertisements, etc)
-
 * `licenses` - inspirations or tie-in licenses (from arcades, books, movies, etc)
-
-* `magfiles` - magazine issues content (electronic magazine files, printed magazine scans, covertape music, etc)
 
 * `nvgs` - oldest files preserved from ftp.nvg.unit.no
 
@@ -106,8 +102,6 @@ The ZXDB schema is described below:
 * `scores` - average score received by each entry at main websites
 
 * `scraps` - obsolete files from the Original WorldOfSpectrum
-
-* `toolfiles` - installation files of cross-platform utilities and development tools
 
 * `topics` - catalogue of magazine sections
 
@@ -268,6 +262,8 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 * **Elia Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
 
 * **Peter Jones**, and **Ricardo Nunes**: for building [Spectrum Computing](https://spectrumcomputing.co.uk/) that hosts the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) (and also providing inumerous other contributions to ZXDB content);
+
+* **Steven Brown**: for recovering and preserving a huge amount of rare programs at [TZXVault](https://tzxvault.org/), and helping to add them to ZXDB;
 
 * **Hikoki**: for cataloguing all titles released in recent years, and helping to add this information to ZXDB (and also providing inumerous other contributions to ZXDB content);
 
