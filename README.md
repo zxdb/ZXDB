@@ -300,6 +300,8 @@ The following websites directly use ZXDB internally:
 
 * [Lisias' Raspberry Pi](http://service.retro.lisias.net/db/) - ZX-Spectrum search engine based on ZXDB, built on Raspberry Pi by **Lisias Toledo**.
 
+* [WorldOfSpectrum Classic](https://worldofspectrum.net/) - The remake of Martijn's original ZX-Spectrum archive is now powered by ZXDB.
+
 * [New WorldOfSpectrum](https://worldofspectrum.org/) - ZX-Spectrum archive rebuilt by **Lee Fogarty**, it was launched in June 2020 although using ZXDB version 1.08 from September 2018.
 
 The following websites are fully integrated with ZXDB:
