@@ -54,6 +54,12 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'invalid archive.org link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%/archive.org/%' and d.file_link not like 'https://archive.org/download/%'
     union all
+        select e.id,e.title,d.file_link,'invalid link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
+    union all
+        select e.id,e.title,d.file_link,'invalid link in scraps' from scraps d left join entries e on d.entry_id = e.id where d.file_link like '%/%' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
+    union all
+        select null,null,file_link,'invalid link in files' from files where file_link not like '/pub/sinclair/%' and file_link not like '/zxdb/sinclair/%' and file_link not like 'http%'
+    union all
         select null,null,m.archive_mask,'invalid archive.org mask in magazines' from magazines m where m.archive_mask is not null and m.archive_mask not like 'https://archive.org/download/%'
     union all
         select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'')
