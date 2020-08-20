@@ -3,14 +3,6 @@
 
 USE zxdb;
 
--- Remove old data
-drop table if exists zxsr_captions;
-drop table if exists zxsr_scores;
-drop table if exists zxsr_reviews;
-drop table if exists tmp_reviews;
-drop table if exists tmp_issues;
-drop table if exists tmp_magazines;
-
 -- Map SSD_Magazines(mag_id) from/to ZXDB.magazines(id)
 create table tmp_magazines(
   ssd_mag_id INT(11) NOT NULL primary key,
@@ -145,30 +137,7 @@ update tmp_reviews t inner join ssd.ssd_reviews_scores s on t.id = s.review_id i
 drop table tmp_score_groups;
 
 -- Store review text in ZXDB
-create table zxsr_reviews(
-    id int(11) not null primary key,
-    review_text longtext,
-    review_comments longtext,
-    review_rating varchar(2000),
-    reviewers varchar(250)
-);
-
 insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select parent_id, review_text, review_comments, review_rating, reviewers from tmp_reviews group by parent_id, review_text, review_comments, review_rating, reviewers);
-
--- Modify existing ZXDB table magrefs
-alter table magrefs add column score_group varchar(100) not null default '' after is_supplement;
-alter table magrefs drop foreign key fk_magref_entry;
-alter table magrefs drop foreign key fk_magref_issue;
-alter table magrefs drop index uk_magref_entry;
-alter table magrefs drop index uk_magref;
-alter table magrefs add constraint uk_magref_entry unique(entry_id,issue_id,page,is_supplement,referencetype_id,score_group);
-alter table magrefs add constraint uk_magref unique (issue_id,page,is_supplement,referencetype_id,entry_id,label_id,topic_id,score_group);
-alter table magrefs add constraint fk_magref_entry foreign key (entry_id) references entries(id);
-alter table magrefs add constraint fk_magref_issue foreign key (issue_id) references issues(id);
-alter table magrefs add column review_id int(11) after score_group;
-alter table magrefs add constraint fk_magref_review foreign key (review_id) references zxsr_reviews(id);
-alter table magrefs add column award_id tinyint(4) after review_id;
-alter table magrefs add constraint fk_magref_award foreign key (award_id) references zxsr_awards(id);
 
 -- Add a magazine reference in magrefs if it's not already there
 insert into magrefs(referencetype_id, entry_id, issue_id, page, is_supplement) (select 10, entry_id, issue_id, page, is_supplement from tmp_reviews where id not in (select t.id from tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and t.is_supplement = r.is_supplement and r.referencetype_id = 10) group by entry_id, issue_id, page, is_supplement);
@@ -190,18 +159,6 @@ set t.magref_id = r.id;
 insert into magreffeats (magref_id, feature_id) (select t.magref_id, f.id from tmp_reviews t left join features f on f.name = t.mag_section and f.id between 100 and 800 left join magreffeats z on z.magref_id = t.magref_id and z.feature_id = f.id where t.mag_section is not null and z.magref_id is null group by t.magref_id, f.id);
 
 -- Store review scores in ZXDB
-create table zxsr_scores(
-    magref_id int(11) not null,
-    score_seq tinyint(4) not null,
-    category varchar(100) not null,
-    is_overall tinyint(1) not null,
-    score varchar(100),
-    comments varchar(1000),
-    constraint fk_zxsr_score_magref foreign key (magref_id) references magrefs(id),
-    constraint bk_zxsr_score_overall check (is_overall in (0,1)),
-    primary key(magref_id,score_seq)
-);
-
 insert into zxsr_scores(magref_id, score_seq, category, is_overall, score, comments) (select t.magref_id, s.header_order, s.review_header, 0, nullif(concat(coalesce(trim(s.review_score),''),coalesce(trim(s.score_suffix),'')),''),nullif(s.score_text,'') from ssd.ssd_reviews_scores s inner join tmp_reviews t on s.review_id = t.id);
 
 -- Add a reference to the compilation content's review in ZXDB if it's not already there
@@ -243,6 +200,9 @@ and t.page = r.page
 and t.is_supplement = r.is_supplement
 and r.referencetype_id = 10 and
 r.score_group = '');
+
+-- Identify overall scores
+update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq > s1.score_seq set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or s1.category = 'ACE Rating' or s1.category = 'Verdict' or (s1.category like 'Overall%' and s1.category not like 'Overall (%') and s1.score not like '%K)');
 
 -- Store review picture description in ZXDB
 create table zxsr_captions(
@@ -292,18 +252,8 @@ update zxsr_captions set caption_seq=(select max(caption_seq)+1 from zxsr_captio
 alter table zxsr_captions add primary key(magref_id,caption_seq,is_banner);
 alter table zxsr_captions drop column id;
 
-drop table if exists tmp_reviews;
-drop table if exists tmp_issues;
-drop table if exists tmp_magazines;
-
-update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq = s1.score_seq+1 set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or (s1.category like 'Overall%' and s1.category not like 'Overall (%'));
-
-insert into zxsr_scores(magref_id, score_seq, category, is_overall, score) (select id, 1, 'Score', 1, score from magrefs where score is not null and id not in (select magref_id from zxsr_scores));
-
-update magrefs r inner join zxsr_scores s on s.magref_id = r.id and s.is_overall = 1 set r.score = null where r.score is not null and (r.score = coalesce(s.score,'') or concat(r.score,'/10') = coalesce(s.score,''));
-
-update zxsr_scores set category = 'Stars', score = replace(score,' stars','') where score like '% stars';
-
-update magrefs set score = null where score = 'Not Rated';
+drop table tmp_reviews;
+drop table tmp_issues;
+drop table tmp_magazines;
 
 -- END
