@@ -28,7 +28,7 @@ load data local infile 'mapy.txt' into table tmp_mapy character set latin2 field
 
 delete from webrefs where website_id = 6;
 
-insert into webrefs(entry_id, link, website_id, idiom_id) (select id, concat('http://maps.speccy.cz/map.php?id=',left(file_image,length(file_image)-4)), 6, 'en' from tmp_mapy where id <> '' and id in (select id from entries) group by id, file_image order by id);
+insert into webrefs(entry_id, link, website_id, language_id) (select id, concat('http://maps.speccy.cz/map.php?id=',left(file_image,length(file_image)-4)), 6, 'en' from tmp_mapy where id <> '' and id in (select id from entries) group by id, file_image order by id);
 
 drop table tmp_mapy;
 

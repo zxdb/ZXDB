@@ -22,7 +22,7 @@ select * from (
     union all
          select p.entry_id,e.title,p.publisher_seq-1,'skipped a publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
-         select id,title,comments,'malformed reference to another entry in comments' from entries where (comments like '%{%}%' and comments not like '%{%|%|%}%') or (comments like '%{%}%{%}%' and comments not like '%{%|%|%}%{%|%|%}%') or (comments like '%{%}%{%}%{%}%' and comments not like '%{%|%|%}%{%|%|%}%{%|%|%}%')
+         select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%')
     union all
          select e.id,e.title,g.text,'program authored with another program that is not utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%'
     union all
@@ -56,6 +56,12 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'invalid link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
     union all
+        select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
+    union all
+        select e.id,e.title,d.file_link,'invalid ZX80/ZX81 border color' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id between 1 and 3 and d.scr_border<>7
+    union all
+        select e.id,e.title,d.file_link,'invalid ZX80/ZX81 load screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id = 1
+    union all
         select e.id,e.title,d.file_link,'invalid link in scraps' from scraps d left join entries e on d.entry_id = e.id where d.file_link like '%/%' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
     union all
         select null,null,file_link,'invalid link in files' from files where file_link not like '/pub/sinclair/%' and file_link not like '/zxdb/sinclair/%' and file_link not like 'http%'
@@ -65,6 +71,12 @@ select * from (
         select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'')
     union all
         select null,null,concat(m.name,' ',i1.date_year,'/',i1.date_month),'duplicated magazine issue' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number is null and i2.number is null and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.date_year,-1) = coalesce(i2.date_year,-1) and coalesce(i1.date_month,-1) = coalesce(i2.date_month,-1) and coalesce(i1.date_day,-1) = coalesce(i2.date_day,-1)
+    union all
+        select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' supplement'),'unidentified magazine issue supplement' from issues i inner join magazines m on m.id = i.magazine_id where i.parent_id is not null and i.supplement = 'supplement'
+    union all
+        select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent is not null
+    union all
+        select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
     union all
         select null,null,concat(name,' (',id,')'),'available magazine without catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
     union all
@@ -86,19 +98,15 @@ select * from (
     union all
         select e.id,e.title,t.text,'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
     union all
-        select id,title,comments,'programs in compilation must be indexed properly' from entries where comments like '[%+%]'
+        select e.id,e.title,text,'programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
     union all
-        select id,title,spot_comments,'programs in compilation must be indexed properly' from entries where spot_comments like '[%+%]'
+        select e.id,e.title,text,'aliases must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'aka. %' or text like 'a.k.a. %'
     union all
-        select id,title,comments,'aliases must be indexed properly' from entries where comments like 'aka. %'
+        select e.id,e.title,text,'notes pending revision' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
     union all
-        select id,title,spot_comments,'aliases must be indexed properly' from entries where spot_comments like 'aka. %'
+        select e.id,e.title,text,'notes referencing old WoS website' from notes n left join entries e on e.id = n.entry_id where text like '%infoseek%'
     union all
-        select id,title,comments,'comments pending revision' from entries where coalesce(comments,'') <> replace(coalesce(comments,''),'\\ ',' ')
-    union all
-        select id,title,comments,'comments referencing old WoS website' from entries where comments like '%infoseek%'
-    union all
-        select id,title,comments,'derived versions must be indexed properly' from entries where comments like 'An updated version of %' and id not in (select entry_id from relations where relationtype_id = 'u')
+        select e.id,e.title,text,'derived versions must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'An updated version of %' and e.id not in (select entry_id from relations where relationtype_id = 'u')
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from compilations where entry_id is not null) or id in (select compilation_id from compilations) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations) or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs))
     union all
@@ -122,9 +130,9 @@ select * from (
     union all
          select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
     union all
-        select e.id,e.title,x.file_link,'archived non-historical file' from extras x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
+        select e.id,e.title,x.file_link,'archived non-historical file' from scraps x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
     union all
-        select null,null,d.file_link,'archived file in use' from extras x inner join downloads d where x.file_link = d.file_link
+        select null,null,d.file_link,'archived file in use' from scraps x inner join downloads d where x.file_link = d.file_link
     union all
         select e.id,e.title,g.text,'entry linked to magazine must be Covertape or Electronic Magazine' from entries e left join genretypes g on e.genretype_id = g.id where e.issue_id is not null and e.title not like 'DigiTape%' and (e.genretype_id is null or e.genretype_id not in (81,82))
     union all
@@ -138,9 +146,7 @@ select * from (
     union all
         select entry_id,library_title,replace(library_title, ' ', '%'),'invalid character in aliases.library_title' from aliases where library_title like '% %' or library_title like '%–%'
     union all
-        select id,title,replace(replace(comments, ' ', '%'), '–', '%'),'invalid character in entries.comments' from entries where comments like '% %' or comments like '%–%'
-    union all
-        select id,title,replace(replace(spot_comments, ' ', '%'), '–', '%'),'invalid character in entries.spot_comments' from entries where spot_comments like '% %' or spot_comments like '%–%'
+        select e.id,e.title,replace(replace(text, ' ', '%'), '–', '%'),'invalid character in notes' from notes n left join entries e on e.id = n.entry_id where text like '% %' or text like '%–%'
     union all
         select null,null,replace(name, ' ', '%'),'invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
     union all

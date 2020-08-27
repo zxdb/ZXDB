@@ -25,8 +25,8 @@ update tmp_rzx set youtube_url = null where youtube_url in ('NULL', 'https://you
 
 delete from webrefs where website_id in (15,16);
 
-insert into webrefs(entry_id, link, website_id, idiom_id) (select zxdb_id, download_url, 15, 'en' from tmp_rzx where zxdb_id is not null and download_url is not null order by zxdb_id);
-insert into webrefs(entry_id, link, website_id, idiom_id) (select zxdb_id, youtube_url, 16, 'en' from tmp_rzx where zxdb_id is not null and youtube_url is not null order by zxdb_id);
+insert into webrefs(entry_id, link, website_id, language_id) (select zxdb_id, download_url, 15, 'en' from tmp_rzx where zxdb_id is not null and download_url is not null order by zxdb_id);
+insert into webrefs(entry_id, link, website_id, language_id) (select zxdb_id, youtube_url, 16, 'en' from tmp_rzx where zxdb_id is not null and youtube_url is not null order by zxdb_id);
 
 drop table tmp_rzx;
 

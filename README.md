@@ -2,7 +2,7 @@
 
 ZXDB is an open database containing historical information of software, hardware, magazines and books about ZX-Spectrum and related machines.
 
-It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), and **Chris Bourne**'s ZXSR archives (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
+It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), and **Chris Bourne**'s [ZXSR](http://www.zxspectrumreviews.co.uk/) archives (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
 
 For further details, visit the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) at [Spectrum Computing](https://spectrumcomputing.co.uk/).
 
@@ -58,6 +58,7 @@ The ZXDB schema is described below:
   * `{d#}` - magazine issue day, with (at least) # digits
   * `{p#}` - page number, with (at least) # digits
   * `{s#}` - magazine special issue string, preceded by character '#'
+  * `{u#}` - magazine issue supplement string, preceded by character '#'
 
 * `releases` - each release of an item (date, price, publisher, etc)
   * `release_seq=0` - original release
@@ -73,7 +74,7 @@ The ZXDB schema is described below:
 
 #### _SECONDARY TABLES_
 
-* `aliases` - alternate titles for items (sometimes generic, sometimes just for a specific release and/or idiom)
+* `aliases` - alternate titles for items (sometimes generic, sometimes just for a specific release and/or language)
 
 * `downloads` - available material related to a specific entry/release (screenshot, tape image, inlay, map, instructions, etc)
 
@@ -92,6 +93,8 @@ The ZXDB schema is described below:
 * `issues` - each published issue of a magazine
 
 * `licenses` - inspirations or tie-in licenses (from arcades, books, movies, etc)
+
+* `notes` - additional information about each entry (known errors, received awards, etc)
 
 * `nvgs` - oldest files preserved from ftp.nvg.unit.no
 
@@ -160,8 +163,6 @@ The ZXDB schema is described below:
 
 * `filetypes` - list of file types (screenshot, tape image, inlay, photo, poster, etc)
 
-* `formattypes` - list of file format types (screenshot as SCR or GIF, tape image as TZX or TAP, etc)
-
 * `genretypes` - list of entry types (program type, book type, hardware type, etc)
 
 * `grouptypes` - list of group types:
@@ -175,9 +176,9 @@ The ZXDB schema is described below:
   * `Turn Mode` - programs that support a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
   * `Control Option` - programs that support a certain control option (Kempston joystick, redefineable keys, etc)
 
-* `idioms` - list of idioms (using ISO 639-1 standard codes)
-
 * `labeltypes` - list of label types (person, nickname, companies)
+
+* `languages` - list of languages (using ISO 639-1 standard codes)
 
 * `licensetypes` - list of license types (arcade coin-up, book, movie, etc)
 
@@ -189,6 +190,8 @@ The ZXDB schema is described below:
   * `ZX-Spectrum 128K` - programs that require (at least) 128K
   * `ZX-Spectrum 128K (load in USR0 mode)` - programs that require (at least) 128K, and must be loaded in USR0 mode
   * `...`
+
+* `notetypes` - list of note types (awards, errors, etc)
 
 * `permissiontypes` - permission types:
   * `Allowed` - copyright owner allowed distribution permission for all titles
@@ -213,9 +216,22 @@ The ZXDB schema is described below:
 
 * `sourcetypes` - indicates "source" of certain files (according to Martijn's internal notes)
 
+* `tooltypes` - list of tool types (emulator, cross-development utility, etc)
+
 * `topictypes` - magazine section types
 
 * `variationtypes` - list of possible item variations (full version, demo, or soundtrack only)
+
+
+#### _ZXSR TABLES_
+
+* `zxsr_awards` - magazine review awards
+
+* `zxsr_captions` - magazine review captions
+
+* `zxsr_reviews` - magazine review texts
+
+* `zxsr_scores` - magazine review scores
 
 
 #### _ADDITIONAL DETAILS_
@@ -274,6 +290,8 @@ Also special thanks to everyone that contributed to the creation of ZXDB, partic
 * **Martijn van der Heide**: for creating and maintaining the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive, and directly helping to import it into ZXDB (clarifying our trickiest questions about the most obscure flags in the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) internal files).
 
 * **Jim Grimwood**: for creating and maintaining the original [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) archive.
+
+* **Chris Bourne**: for creating and maintaining the original [ZXSR](http://www.zxspectrumreviews.co.uk/) archive.
 
 * **Gerard Sweeney**: for invaluable assistance on importing all original content from the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive.
 

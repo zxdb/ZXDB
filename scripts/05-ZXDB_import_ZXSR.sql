@@ -33,16 +33,17 @@ create table tmp_issues(
 );
 
 insert into tmp_issues(ssd_issuecode, issue_id) values
-((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = '1984 Annual' and m.mag_name = 'Sinclair User Annual'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where m.name = 'Sinclair User Annual' and i.date_year = 1984)),
-((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue December 1984' and m.mag_name = 'ZX Collection'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where m.name = 'ZX Collection' and i.date_year = 1984));
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = '1984 Annual' and m.mag_name = 'Sinclair User Annual'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'Sinclair User Annual' and i.date_year = 1984)),
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue December 1984' and m.mag_name = 'ZX Collection'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'ZX Collection' and i.date_year = 1984)),
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue May 1986' and m.mag_name = 'Popular Computing Weekly Supplement'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is not null and m.name = 'Popular Computing Weekly' and i.number = 21));
 
-insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue ',i.number,', ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.date_year is not null and i.date_month is not null and i.number is not null);
+insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue ',i.number,', ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.parent_id is null and i.date_year is not null and i.date_month is not null and i.number is not null);
 
-insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue 0',i.number,', ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.date_year is not null and i.date_month is not null and i.number is not null);
+insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue 0',i.number,', ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.parent_id is null and i.date_year is not null and i.date_month is not null and i.number is not null);
 
-insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.date_year is not null and i.date_month is not null and s.IssueCode not in (select ssd_issuecode from tmp_issues));
+insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.parent_id is null and i.date_year is not null and i.date_month is not null and s.IssueCode not in (select ssd_issuecode from tmp_issues));
 
-insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and i.number = substring(substring_index(s.Issue,',',1),7) where s.Issue like 'Issue %,%' and s.IssueCode not in (select ssd_issuecode from tmp_issues));
+insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and i.number = substring(substring_index(s.Issue,',',1),7) where i.parent_id is null and s.Issue like 'Issue %,%' and s.IssueCode not in (select ssd_issuecode from tmp_issues));
 
 select * from ssd.ssd_issues r where r.IssueCode not in (select t.ssd_issuecode from tmp_issues t);
 select * from ssd.ssd_reviews r where r.issue_code not in (select t.ssd_issuecode from tmp_issues t);
@@ -78,15 +79,19 @@ select s.review_id, g.WOSID, i.issue_id,
 nullif(trim(substring_index(replace(replace(s.review_page,'(Supplement)',''),'.',','),',',1)),''),
 if (s.review_page like '%(Supplement)',1,0),
 m.mag_name,
-nullif(replace(s.review_text,'\r\n','#'),''),
-nullif(replace(replace(s.review_comments,'\r\n','#'),'¬','####'),''),
-nullif(replace(s.review_rating,'\r\n','#'),''),
+nullif(replace(s.review_text,'\r',''),''),
+nullif(replace(replace(s.review_comments,'\r',''),'¬','\n\n\n\n'),''),
+nullif(replace(s.review_rating,'\r',''),''),
 nullif(s.reviewers,''),
 if (s.award_id<>999,s.award_id,null)
 from ssd.ssd_reviews s
 left join ssd.ssd_game g on g.ID = s.game_id
 left join tmp_issues i on s.issue_code=i.ssd_issuecode
 left join ssd.ssd_magazines m on m.mag_id = s.mag_type and m.mag_id between 7 and 18);
+
+-- Fix issue supplement references
+update tmp_reviews r left join issues i on r.issue_id = i.parent_id set r.issue_id = i.id where r.is_supplement = 1;
+alter table tmp_reviews drop column is_supplement;
 
 -- Choose a single copy of duplicated reviews
 update tmp_reviews set parent_id = id where id in (select min(id) from tmp_reviews group by review_text,review_comments,review_rating,reviewers);
@@ -140,30 +145,30 @@ drop table tmp_score_groups;
 insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select parent_id, review_text, review_comments, review_rating, reviewers from tmp_reviews group by parent_id, review_text, review_comments, review_rating, reviewers);
 
 -- Add a magazine reference in magrefs if it's not already there
-insert into magrefs(referencetype_id, entry_id, issue_id, page, is_supplement) (select 10, entry_id, issue_id, page, is_supplement from tmp_reviews where id not in (select t.id from tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and t.is_supplement = r.is_supplement and r.referencetype_id = 10) group by entry_id, issue_id, page, is_supplement);
+insert into magrefs(referencetype_id, entry_id, issue_id, page) (select 10, entry_id, issue_id, page from tmp_reviews where id not in (select t.id from tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and r.referencetype_id = 10) group by entry_id, issue_id, page);
 
 -- Store review information in magrefs
-update tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and t.is_supplement = r.is_supplement and r.referencetype_id = 10 set r.score_group = t.score_group, r.review_id = t.parent_id, r.award_id = t.award_id where t.variant = 0;
+update tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and r.referencetype_id = 10 set r.score_group = t.score_group, r.review_id = t.parent_id, r.award_id = t.award_id where t.variant = 0;
 
-insert into magrefs(referencetype_id, entry_id, issue_id, page, is_supplement, score_group, review_id, award_id) (select 10, entry_id, issue_id, page, is_supplement, score_group, parent_id, award_id from tmp_reviews where variant=1);
+insert into magrefs(referencetype_id, entry_id, issue_id, page, score_group, review_id, award_id) (select 10, entry_id, issue_id, page, score_group, parent_id, award_id from tmp_reviews where variant=1);
 
 update tmp_reviews t inner join magrefs r on t.entry_id = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
-and t.is_supplement = r.is_supplement
 and t.score_group = r.score_group
 and r.referencetype_id = 10
-set t.magref_id = r.id;
+set t.magref_id = r.id
+where 1=1;
 
 -- Store review "mag section" in ZXDB
 insert into magreffeats (magref_id, feature_id) (select t.magref_id, f.id from tmp_reviews t left join features f on f.name = t.mag_section and f.id between 100 and 800 left join magreffeats z on z.magref_id = t.magref_id and z.feature_id = f.id where t.mag_section is not null and z.magref_id is null group by t.magref_id, f.id);
 
 -- Store review scores in ZXDB
-insert into zxsr_scores(magref_id, score_seq, category, is_overall, score, comments) (select t.magref_id, s.header_order, s.review_header, 0, nullif(concat(coalesce(trim(s.review_score),''),coalesce(trim(s.score_suffix),'')),''),nullif(s.score_text,'') from ssd.ssd_reviews_scores s inner join tmp_reviews t on s.review_id = t.id);
+insert into zxsr_scores(magref_id, score_seq, category, is_overall, score, comments) (select t.magref_id, s.header_order, s.review_header, 0, nullif(concat(coalesce(trim(s.review_score),''),coalesce(trim(s.score_suffix),'')),''),nullif(replace(s.score_text,'\r',''),'') from ssd.ssd_reviews_scores s inner join tmp_reviews t on s.review_id = t.id);
 
 -- Add a reference to the compilation content's review in ZXDB if it's not already there
-insert into magrefs(referencetype_id, entry_id, issue_id, page, is_supplement)
-(select 10, g.WOSID, t.issue_id, t.page, t.is_supplement from ssd.ssd_reviews_scores_compilations c
+insert into magrefs(referencetype_id, entry_id, issue_id, page)
+(select 10, g.WOSID, t.issue_id, t.page from ssd.ssd_reviews_scores_compilations c
 inner join ssd.ssd_game g on g.ID = c.game_id
 inner join tmp_reviews t on c.review_id = t.id
 where c.score_id not in (
@@ -173,9 +178,8 @@ inner join tmp_reviews t on c.review_id = t.id
 inner join magrefs r on g.WOSID = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
-and t.is_supplement = r.is_supplement
 and r.referencetype_id = 10)
-group by g.WOSID, t.issue_id, t.page, t.is_supplement);
+group by g.WOSID, t.issue_id, t.page);
 
 -- Store compilation content's review information in magrefs
 update ssd.ssd_reviews_scores_compilations c
@@ -184,10 +188,10 @@ inner join tmp_reviews t on c.review_id = t.id
 inner join magrefs r on g.WOSID = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
-and t.is_supplement = r.is_supplement
 and r.referencetype_id = 10
 and r.score_group = ''
-set r.review_id = t.parent_id;
+set r.review_id = t.parent_id
+where 1=1;
 
 -- Store compilation content's review scores in ZXDB
 insert into zxsr_scores(magref_id, score_seq, category, is_overall, score) (select r.id, c.header_order, c.review_header, 0, nullif(concat(coalesce(trim(c.review_score),''),coalesce(trim(c.score_suffix),'')),'')
@@ -197,25 +201,32 @@ inner join tmp_reviews t on c.review_id = t.id
 inner join magrefs r on g.WOSID = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
-and t.is_supplement = r.is_supplement
 and r.referencetype_id = 10 and
 r.score_group = '');
 
 -- Identify overall scores
 update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq > s1.score_seq set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or s1.category = 'ACE Rating' or s1.category = 'Verdict' or (s1.category like 'Overall%' and s1.category not like 'Overall (%') and s1.score not like '%K)');
 
--- Store review picture description in ZXDB
-create table zxsr_captions(
-    id int(11) not null,
-    magref_id int(11) not null,
-    caption_seq smallint(6) not null,
-    text varchar(10000) not null,
-    is_banner tinyint(1) not null,
-    constraint fk_zxsr_caption_magref foreign key (magref_id) references magrefs(id),
-    constraint bk_zxsr_caption_banner check (is_banner in (0,1))
-);
+-- Store review picture descriptions in ZXDB
+insert into zxsr_captions(id, magref_id, caption_seq, text, is_banner) (select s.id,t.magref_id, 0, replace(s.TheText,'\r',''), s.IsBanner from ssd.ssd_reviews_picturetext s inner join tmp_reviews t on s.ReviewId = t.id);
 
-insert into zxsr_captions(id, magref_id, caption_seq, text, is_banner) (select s.id,t.magref_id, 0, s.TheText, s.IsBanner from ssd.ssd_reviews_picturetext s inner join tmp_reviews t on s.ReviewId = t.id);
+update zxsr_reviews set review_text = SUBSTR(review_text,2) where review_text like '\n%';
+update zxsr_reviews set review_text = SUBSTR(review_text,1,CHAR_LENGTH(review_text)-1) where review_text like '%\n';
+update zxsr_reviews set review_text = SUBSTR(review_text,1,CHAR_LENGTH(review_text)-1) where review_text like '%\n';
+
+update zxsr_reviews set review_comments = SUBSTR(review_comments,2) where review_comments like '\n%';
+update zxsr_reviews set review_comments = SUBSTR(review_comments,1,CHAR_LENGTH(review_comments)-1) where review_comments like '%\n';
+
+update zxsr_reviews set review_rating = SUBSTR(review_rating,2) where review_rating like '\n%';
+update zxsr_reviews set review_rating = SUBSTR(review_rating,1,CHAR_LENGTH(review_rating)-1) where review_rating like '%\n';
+update zxsr_reviews set review_rating = SUBSTR(review_rating,1,CHAR_LENGTH(review_rating)-1) where review_rating like '%\n';
+update zxsr_reviews set review_rating = SUBSTR(review_rating,1,CHAR_LENGTH(review_rating)-1) where review_rating like '%\n';
+
+update zxsr_scores set comments = SUBSTR(comments,2) where comments like '\n%';
+update zxsr_scores set comments = SUBSTR(comments,1,CHAR_LENGTH(comments)-1) where comments like '%\n';
+
+update zxsr_captions set text = SUBSTR(text,2) where text like '\n%';
+update zxsr_captions set text = SUBSTR(text,1,CHAR_LENGTH(text)-1) where text like '%\n';
 
 -- Calculate review picture description sequences
 update zxsr_captions set caption_seq=(select max(caption_seq)+1 from zxsr_captions) where id in (select min(id) from zxsr_captions where caption_seq=0 group by magref_id);
