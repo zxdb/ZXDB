@@ -12,17 +12,15 @@ create table tmp_dir (
 
 load data local infile 'dir.txt' into table tmp_dir character set latin2 fields terminated by '\t' lines terminated by '\n';
 
-select * from tmp_dir where file_link not in (select file_link from downloads) and file_link not in (select file_link from files) and file_link not in (select file_link from scraps where file_link is not null) and file_link not in (select file_link from extras where file_link is not null) order by file_link;
+select * from tmp_dir where file_link not in (select file_link from downloads) and file_link not in (select file_link from files) and file_link not in (select file_link from scraps where file_link is not null) order by file_link;
 
 select * from downloads where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 select * from files where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 select * from scraps where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
-select * from extras where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 
 update downloads d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size, d.file_md5 = t.file_md5 where d.file_link like '/zxdb/%';
 update files d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size, d.file_md5 = t.file_md5 where d.file_link like '/zxdb/%';
 update scraps d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
-update extras d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';
 
 drop table tmp_dir;
 

@@ -6,7 +6,7 @@ USE zxdb;
 select * from (
         select a.entry_id,e.title,a.author_seq-1 as details,'skipped an author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
-        select id,title,'0','no release number in releases' from entries where id not in (select entry_id from releases)
+        select id,title,'0','** no release number in releases' from entries where id not in (select entry_id from releases)
     union all
         select e.id,e.title,r.release_seq-1,'skipped a release number in releases' from releases r inner join entries e on r.entry_id = e.id where r.release_seq > 0 and r.release_seq-1 not in (select r2.release_seq from releases r2 where r2.entry_id = r.entry_id)
     union all
@@ -18,9 +18,9 @@ select * from (
     union all
          select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.group_id = m.group_id)
     union all
-         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in group that is not series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.grouptype_id <> 'S'
+         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'** invalid sequence number in group that is not series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.grouptype_id <> 'S'
     union all
-         select p.entry_id,e.title,p.publisher_seq-1,'skipped a publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
+         select p.entry_id,e.title,p.publisher_seq-1,'** skipped a publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
          select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%')
     union all
@@ -34,37 +34,39 @@ select * from (
     union all
          select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
-        select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
+        select e.id,e.title,t.text,'** timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
     union all
-        select e.id,e.title,g.text,'books should have ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
+        select e.id,e.title,g.text,'** books should have ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
     union all
-        select e.id,e.title,g.text,'hardware devices should have ID above 1000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Hardware%' and e.id not between 1000000 and 1999999
+        select e.id,e.title,g.text,'** hardware devices should have ID above 1000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Hardware%' and e.id not between 1000000 and 1999999
     union all
-        select e.id,e.title,t.text,'title with ID above 4000000 that is not timex program' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
+        select e.id,e.title,t.text,'** title with ID above 4000000 that is not timex program' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
     union all
-        select e.id,e.title,g.text,'title with ID above 2000000 that is not book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
+        select e.id,e.title,g.text,'** title with ID above 2000000 that is not book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
     union all
-        select e.id,e.title,g.text,'title with ID above 1000000 that is not hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
+        select e.id,e.title,g.text,'** title with ID above 1000000 that is not hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
     union all
-        select e.id,e.title,d.file_link,'unknown file extension' from downloads d inner join entries e on d.entry_id = e.id left join extensions x on d.file_link like CONCAT('%',x.ext) where x.ext is null and d.file_link not like 'http%' and d.file_link not like '%.zip' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '%_SourceCode.tar.bz2'
+        select e.id,e.title,d.file_link,'** unknown file extension' from downloads d inner join entries e on d.entry_id = e.id left join extensions x on d.file_link like CONCAT('%',x.ext) where x.ext is null and d.file_link not like 'http%' and d.file_link not like '%.zip' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '%_SourceCode.tar.bz2'
     union all
-        select e.id,e.title,d.file_link,'mispelled file extension' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%,zip'
+        select e.id,e.title,d.file_link,'** mispelled file extension' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%,zip'
     union all
         select null,null,concat(s.name,' / ',b.name),'license of "people" must not have owner' from licensors l inner join licenses s on l.license_id = s.id inner join labels b on b.id = l.label_id where s.licensetype_id = '-'
     union all
         select e.id,e.title,d.file_link,'invalid archive.org link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%/archive.org/%' and d.file_link not like 'https://archive.org/download/%'
     union all
-        select e.id,e.title,d.file_link,'invalid link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
+        select e.id,e.title,d.file_link,'** invalid link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
     union all
         select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
     union all
-        select e.id,e.title,d.file_link,'invalid ZX80/ZX81 border color' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id between 1 and 3 and d.scr_border<>7
+        select e.id,e.title,d.file_link,'** invalid ZX80/ZX81 border color' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id between 1 and 3 and d.scr_border<>7
     union all
         select e.id,e.title,d.file_link,'invalid ZX80/ZX81 load screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id = 1
     union all
-        select e.id,e.title,d.file_link,'invalid link in scraps' from scraps d left join entries e on d.entry_id = e.id where d.file_link like '%/%' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
+        select e.id,e.title,d.file_link,'invalid link in scraps' from scraps d left join entries e on d.entry_id = e.id where d.file_link like '%/%' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%'
     union all
         select null,null,file_link,'invalid link in files' from files where file_link not like '/pub/sinclair/%' and file_link not like '/zxdb/sinclair/%' and file_link not like 'http%'
+    union all
+        select null,null,file_link,'this file belongs to table downloads' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select null,null,m.archive_mask,'invalid archive.org mask in magazines' from magazines m where m.archive_mask is not null and m.archive_mask not like 'https://archive.org/download/%'
     union all
@@ -74,9 +76,11 @@ select * from (
     union all
         select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' supplement'),'unidentified magazine issue supplement' from issues i inner join magazines m on m.id = i.magazine_id where i.parent_id is not null and i.supplement = 'supplement'
     union all
-        select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent is not null
+        select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent_id is not null
     union all
         select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
+    union all
+        select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page), '** mismatch between review and award' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id inner join zxsr_awards a on r.award_id = a.id left join entries e on e.id = r.entry_id where i.magazine_id <> a.magazine_id
     union all
         select null,null,concat(name,' (',id,')'),'available magazine without catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
     union all
@@ -84,13 +88,13 @@ select * from (
     union all
         select null,null,concat(k.magref_id,' - ',k.link),'mismatch between magazine reference link and host' from magreflinks k inner join hosts h on k.host_id = h.id where k.link not like concat(h.link, '%')
     union all
-        select e.id,e.title,d.file_link,'file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
+        select e.id,e.title,d.file_link,'** file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
     union all
         select null,null,concat(t.text,': ',name,' (',g.id,')'),'group without any members' from groups g inner join grouptypes t on t.id = g.grouptype_id where g.id not in (select group_id from members)
     union all
         select e.id,e.title,t.text,'compilation that is not compilation' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select compilation_id from compilations) and (e.genretype_id is null or e.genretype_id < 80)
     union all
-        select e.id,e.title,t.text,'published program without magazine or book reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'T' and e.id not in (select entry_id from magrefs where referencetype_id = 0) and e.id not in (select entry_id from booktypeins) 
+        select e.id,e.title,t.text,'published program without magazine or book reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'T' and e.id not in (select entry_id from magrefs where referencetype_id = 0) and e.id not in (select entry_id from booktypeins)
     union all
         select e.id,e.title,t.text,'published program without covertape reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'M' and e.id not in (select c.entry_id from compilations c inner join entries k on c.compilation_id = k.id where c.entry_id is not null and k.genretype_id in (81,82))
     union all
@@ -114,21 +118,21 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'possibly file with incorrect release_seq' from downloads d inner join entries e on d.entry_id = e.id where e.id between 2000000 and 3000000 and d.file_link like '%)%' and d.release_seq=0 and e.id not in (2000113)
     union all
-        select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated groups with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
+        select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'** possibly duplicated groups with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from groups g left join members m on m.group_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
     union all
-        select e.id,e.title,d.file_link,'download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%.pok'
+        select e.id,e.title,d.file_link,'** download link containing spaces' from entries e inner join downloads d on d.entry_id = e.id where d.file_link like '/zxdb/% %' and d.file_link not like '/zxdb/sinclair/pokes/%.pok'
     union all
         select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
     union all
-        select id,title,library_title,'library title should not start with article "The"' from entries where library_title like 'The %'
+        select id,title,library_title,'** library title should not start with article "The"' from entries where library_title like 'The %'
     union all
         select e.id,e.title,g.name,'CSSCGC title missing from compilation' from entries e inner join members m on m.entry_id = e.id inner join groups g on g.id = m.group_id and g.name like 'CSSCGC Crap Games Contest%' left join entries k on k.title like 'CSSCGC Crap Games Competition%' and e.id <> k.id left join compilations c on c.compilation_id = k.id and c.entry_id = e.id where k.title = concat('CSSCGC Crap Games Competition',right(g.name,5)) and c.entry_id is null
     union all
         select e.id,e.title,k.title,'CSSCGC title missing from contest' from entries e inner join compilations c on c.entry_id = e.id inner join entries k on k.id = c.compilation_id and k.title like 'CSSCGC Crap Games Competition%' left join groups g on g.name like 'CSSCGC Crap Games Contest%' and g.name = concat('CSSCGC Crap Games Contest',right(k.title,5)) left join members m on g.id = m.group_id and m.entry_id = e.id where m.entry_id is null
     union all
-         select e.id,e.title,g.text,'software must be bundled with hardware or book (not the opposite)' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'w' and e.id between 1000000 and 2999999 and r.original_id not between 1000000 and 2999999
+         select e.id,e.title,g.text,'** software must be bundled with hardware or book (not the opposite)' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'w' and e.id between 1000000 and 2999999 and r.original_id not between 1000000 and 2999999
     union all
-         select e.id,e.title,g.text,'only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
+         select e.id,e.title,g.text,'** only hardware can be required' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'h' and coalesce(g.text,'') not like 'Hardware%'
     union all
         select e.id,e.title,x.file_link,'archived non-historical file' from scraps x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
     union all
@@ -138,17 +142,17 @@ select * from (
     union all
         select e.id,e.title,concat(b2.name,' / ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where b1.owner_id = b2.id
     union all
-        select id,title,replace(replace(title, ' ', '%'), '–', '%'),'invalid character in entries.title' from entries where title like '% %' or title like '%–%'
+        select id,title,replace(replace(title, ' ', '%'), '–', '%'),'** invalid character in entries.title' from entries where title like '% %' or title like '%–%'
     union all
-        select id,library_title,replace(replace(library_title, ' ', '%'), '–', '%'),'invalid character in entries.library_title' from entries where library_title like '% %' or library_title like '%–%'
+        select id,library_title,replace(replace(library_title, ' ', '%'), '–', '%'),'** invalid character in entries.library_title' from entries where library_title like '% %' or library_title like '%–%'
     union all
-        select entry_id,title,replace(replace(title, ' ', '%'), '–', '%'),'invalid character in aliases.title' from aliases where title like '% %' or title like '%–%'
+        select entry_id,title,replace(replace(title, ' ', '%'), '–', '%'),'** invalid character in aliases.title' from aliases where title like '% %' or title like '%–%'
     union all
-        select entry_id,library_title,replace(library_title, ' ', '%'),'invalid character in aliases.library_title' from aliases where library_title like '% %' or library_title like '%–%'
+        select entry_id,library_title,replace(library_title, ' ', '%'),'** invalid character in aliases.library_title' from aliases where library_title like '% %' or library_title like '%–%'
     union all
-        select e.id,e.title,replace(replace(text, ' ', '%'), '–', '%'),'invalid character in notes' from notes n left join entries e on e.id = n.entry_id where text like '% %' or text like '%–%'
+        select e.id,e.title,replace(replace(text, ' ', '%'), '–', '%'),'** invalid character in notes' from notes n left join entries e on e.id = n.entry_id where text like '% %' or text like '%–%'
     union all
-        select null,null,replace(name, ' ', '%'),'invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
+        select null,null,replace(name, ' ', '%'),'** invalid space character in labels.name' from labels where name like '% %' or name like '%–%'
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
