@@ -80,6 +80,8 @@ select * from (
     union all
         select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
     union all
+        select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'review from major magazine not listed in ZXSR' from magrefs r inner join issues i on i.id = r.issue_id inner join magazines m on m.id = i.magazine_id inner join entries e on e.id = r.entry_id where r.referencetype_id = 10 and r.review_id is null and m.id in (select i.magazine_id from magrefs r inner join issues i on i.id = r.issue_id where r.referencetype_id = 10 and r.review_id is not null) and r.id not in (select magref_id from magreffeats where feature_id = 6455) and (e.machinetype_id is null or e.machinetype_id <= 10)
+    union all
         select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page), '** mismatch between review and award' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id inner join zxsr_awards a on r.award_id = a.id left join entries e on e.id = r.entry_id where i.magazine_id <> a.magazine_id
     union all
         select null,null,concat(name,' (',id,')'),'available magazine without catalogued issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
@@ -159,6 +161,10 @@ select * from (
         select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
     union all
          select null,null,concat('/zxdb/sinclair/entries/.../',filename),'duplicated filename' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
+    union all
+         select id,title,null,'** duplicated title not marked as deprecated' from entries where id in (select entry_id from relations where relationtype_id = '*') and (availabletype_id is null or availabletype_id <> '*')
+    union all
+         select id,title,null,'** deprecated title without related original title' from entries where id not in (select entry_id from relations where relationtype_id = '*') and availabletype_id = '*'
 ) as errors order by entry_id, details;
 
 -- END
