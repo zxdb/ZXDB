@@ -4,7 +4,7 @@
 USE zxdb;
 
 select * from (
-        select a.entry_id,e.title,a.author_seq-1 as details,'skipped an author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
+        select a.entry_id,e.title,a.author_seq-1 as details,'** skipped an author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
         select id,title,'0','** no release number in releases' from entries where id not in (select entry_id from releases)
     union all
@@ -12,9 +12,9 @@ select * from (
     union all
         select id,title,library_title,'possible mismatch between title and library title' from entries where title <> library_title and left(title,4) = left(library_title,4) and title not like '%+%'
     union all
-         select e.id,e.title,concat(c.tape_seq,'-',c.tape_side,'-',c.prog_seq-1),'skipped an item in compilation' from compilations c inner join entries e on c.compilation_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from compilations c2 where c2.compilation_id = c.compilation_id and c2.tape_seq = c.tape_seq and c2.tape_side = c.tape_side)
+         select e.id,e.title,concat(c.tape_seq,'-',c.tape_side,'-',c.prog_seq-1),'** skipped an item in compilation' from compilations c inner join entries e on c.compilation_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from compilations c2 where c2.compilation_id = c.compilation_id and c2.tape_seq = c.tape_seq and c2.tape_side = c.tape_side)
     union all
-         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.grouptype_id = 'S'
+         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'** missing a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.grouptype_id = 'S'
     union all
          select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped a sequence number in series' from groups g inner join members m on m.group_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.group_id = m.group_id)
     union all
@@ -115,6 +115,8 @@ select * from (
         select e.id,e.title,text,'derived versions must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'An updated version of %' and e.id not in (select entry_id from relations where relationtype_id = 'u')
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from compilations where entry_id is not null) or id in (select compilation_id from compilations) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations) or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs))
+    union all
+        select e.id,e.title,n.text,'pending ZXSR comment to be approved or deleted' from entries e inner join notes n on e.id = n.entry_id where n.notetype_id = 'Z'
     union all
         select e.id,e.title,d.file_link,'possibly demo file not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
     union all
