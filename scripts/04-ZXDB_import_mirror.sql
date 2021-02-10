@@ -19,7 +19,7 @@ delete from tmp_mirror where id = (select max(id) from tmp_mirror);
 
 select * from downloads where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) order by file_link;
 select * from files where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) order by file_link;
-select * from scraps where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) and rationale not in ('unavailable (distribution denied)','broken link at www.worldofspectrum.org','missing file at archive.org mirror replaced by pdf') order by file_link;
+select * from scraps where file_link like '/pub/%' and file_link not in (select file_link from tmp_mirror) and rationale not in ('unavailable (distribution denied)','broken link at www.worldofspectrum.org','missing file at archive.org mirror replaced by pdf','missing file at archive.org mirror replaced by zip') order by file_link;
 
 select * from tmp_mirror where file_link not in (select file_link from downloads) and file_link not in (select file_link from files) and file_link not in (select file_link from scraps where file_link is not null) and file_link not like '/pub/sinclair/magazines/%' and file_link not like '/pub/sinclair/%/' order by file_link;
 
