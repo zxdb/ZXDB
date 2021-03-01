@@ -66,7 +66,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link like '/zxdb/%' and d.file_link not like '%-run-%' and d.entry_id > 30000
     union all
-        select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link like '/zxdb/%' and d.file_link not like '%-open-%'
+        select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link like '/zxdb/%' and d.file_link like '%-%' and d.file_link not like '%-open-%'
     union all
         select null,null,m.archive_mask,'invalid archive.org mask in magazines' from magazines m where m.archive_mask is not null and m.archive_mask not like 'https://archive.org/download/%'
     union all
@@ -167,6 +167,8 @@ select * from (
         select e.id,e.title,concat(b.name,' / ',d.name),'** conflicting information about original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join publishers q on q.entry_id = k.id and q.release_seq = 0 and q.publisher_seq = 1 inner join labels d on d.id = q.label_id where p.label_id <> q.label_id
     union all
         select e.id,e.title,t.text,'** missing list of contents' as todo from entries e inner join genretypes t on e.genretype_id = t.id where (e.genretype_id in (80,81) or e.genretype_id >= 110) and e.id not in (select compilation_id from compilations)
+    union all
+        select e.id, e.title, d.file_link, '** itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
