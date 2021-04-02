@@ -171,6 +171,10 @@ select * from (
         select e.id, e.title, d.file_link, '** itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
     union all
         select e.id, e.title, c.compilation_id, 'redundant alias in compilation' from entries e inner join compilations c on e.id = c.entry_id where e.title = c.alias
+    union all
+        select e.id, e.title, t.text, 'possibly misclassified Game Editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
+    union all
+        select e.id, e.title, t.text, 'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
