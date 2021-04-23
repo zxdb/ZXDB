@@ -159,6 +159,8 @@ The ZXDB schema is described below:
 
 * `countries` - list of countries (using ISO 3166-1 Alpha-2 standard codes)
 
+* `currencies` - list of `currencies (using ISO 4217 standard codes)
+
 * `extensions` - list of supported filename extensions in ZXDB
 
 * `filetypes` - list of file types (screenshot, tape image, inlay, photo, poster, etc)

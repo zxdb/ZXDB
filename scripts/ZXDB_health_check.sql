@@ -54,8 +54,6 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'invalid archive.org link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%/archive.org/%' and d.file_link not like 'https://archive.org/download/%'
     union all
-        select e.id,e.title,d.file_link,'invalid link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link not like '/pub/sinclair/%' and d.file_link not like '/zxdb/sinclair/%' and d.file_link not like 'http%'
-    union all
         select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
     union all
         select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id between 1 and 3 and d.scr_border<>7
@@ -67,8 +65,6 @@ select * from (
         select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link like '/zxdb/%' and d.file_link not like '%-run-%' and d.entry_id > 30000
     union all
         select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link like '/zxdb/%' and d.file_link like '%-%' and d.file_link not like '%-open-%'
-    union all
-        select null,null,m.archive_mask,'invalid archive.org mask in magazines' from magazines m where m.archive_mask is not null and m.archive_mask not like 'https://archive.org/download/%'
     union all
         select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'')
     union all
@@ -108,7 +104,7 @@ select * from (
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from compilations where entry_id is not null) or id in (select compilation_id from compilations) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs))
     union all
-        select e.id,e.title,d.file_link,'** possibly demo version not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
+        select e.id,e.title,d.file_link,'** probably demo version not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
     union all
         select e.id,e.title,d.file_link,'** possibly file with incorrect release_seq' from downloads d inner join entries e on d.entry_id = e.id where e.id between 2000000 and 3000000 and d.file_link like '%)%' and d.release_seq=0 and e.id not in (2000113)
     union all
@@ -132,7 +128,7 @@ select * from (
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
-        select e.id,e.title,d.file_link,'** playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
+        select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
     union all
          select null,null,concat('/zxdb/sinclair/entries/.../',filename),'** duplicated filename' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
     union all
@@ -154,27 +150,33 @@ select * from (
     union all
         select e.id,e.title,concat(k.title,' / ',k2.title),'multiple original publications' from entries e inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join compilations c2 on c2.entry_id = e.id and c2.is_original = 1 and c2.compilation_id <> c.compilation_id inner join entries k2 on k2.id = c2.compilation_id
     union all
-        select e.id,e.title,t.text,'** unidentified original publication' from entries e inner join publicationtypes t on t.id = e.publicationtype_id where e.publicationtype_id in ('C','E','M') and e.id not in (select entry_id from compilations where is_original = 1)
-    union all
-        select e.id,e.title,t.text,'conflicting information about original publication' from entries e inner join publicationtypes t on t.id = e.publicationtype_id where e.publicationtype_id not in ('C','E','M') and e.id in (select entry_id from compilations where is_original = 1)
-    union all
         select e.id,e.title,concat(r.release_year,' x ',rk.release_year),'** conflicting dates for original publication' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join releases rk on rk.entry_id = c.compilation_id and rk.release_seq = 0 where r.release_year <> rk.release_year or r.release_month <> rk.release_month or r.release_day <> rk.release_day
     union all
         select e.id,e.title,b.name,'** direct information about indirect original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id where e.publicationtype_id is not null and e.publicationtype_id <> 'T'
     union all
         select e.id,e.title,k.title,concat('** originally published in ',upper(t.text),' instead of ',substring_index(upper(p.text), ' ', -1)) from entries e inner join compilations c on e.id = c.entry_id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join genretypes t on k.genretype_id = t.id inner join publicationtypes p on e.publicationtype_id = p.id where (e.publicationtype_id = 'E' and k.genretype_id <> 82) or (e.publicationtype_id = 'M' and k.genretype_id <> 81) or (e.publicationtype_id = 'C' and k.genretype_id in (81,82))
     union all
-        select e.id,e.title,concat(b.name,' / ',d.name),'** conflicting information about original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join publishers q on q.entry_id = k.id and q.release_seq = 0 and q.publisher_seq = 1 inner join labels d on d.id = q.label_id where p.label_id <> q.label_id
-    union all
         select e.id,e.title,t.text,'** missing list of contents' as todo from entries e inner join genretypes t on e.genretype_id = t.id where (e.genretype_id in (80,81) or e.genretype_id >= 110) and e.id not in (select compilation_id from compilations)
     union all
-        select e.id, e.title, d.file_link, '** itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
+        select e.id,e.title,d.file_link,'itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
     union all
-        select e.id, e.title, c.compilation_id, 'redundant alias in compilation' from entries e inner join compilations c on e.id = c.entry_id where e.title = c.alias
+        select e.id,e.title,c.compilation_id,'redundant alias in compilation' from entries e inner join compilations c on e.id = c.entry_id where e.title = c.alias
     union all
-        select e.id, e.title, t.text, 'possibly misclassified Game Editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
+        select e.id,e.title,t.text,'possibly misclassified Game Editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
     union all
-        select e.id, e.title, t.text, 'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
+        select e.id,e.title,t.text,'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
+    union all
+        select e.id,e.title,t.text,'** conflicting information about original publication' from entries e left join publicationtypes t on t.id = e.publicationtype_id where (e.publicationtype_id is null or e.publicationtype_id not in ('C','E','M')) and e.id in (select entry_id from compilations where is_original = 1) and e.id <= 15138
+    union all
+        select e.id,e.title,t.text,'conflicting information about original publication' from entries e left join publicationtypes t on t.id = e.publicationtype_id where (e.publicationtype_id is null or e.publicationtype_id not in ('C','E','M')) and e.id in (select entry_id from compilations where is_original = 1) and e.id > 15138
+    union all
+        select e.id,e.title,t.text,'** unidentified original publication' from entries e inner join publicationtypes t on t.id = e.publicationtype_id where e.publicationtype_id in ('C','E','M') and e.id not in (select entry_id from compilations where is_original = 1) and e.id <= 28700
+    union all
+        select e.id,e.title,t.text,'unidentified original publication' from entries e inner join publicationtypes t on t.id = e.publicationtype_id where e.publicationtype_id in ('C','E','M') and e.id not in (select entry_id from compilations where is_original = 1) and e.id > 28700
+    union all
+        select e.id,e.title,concat(b.name,' / ',d.name),'** redundant or conflicting information about original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join publishers q on q.entry_id = k.id and q.release_seq = 0 and q.publisher_seq = 1 inner join labels d on d.id = q.label_id where e.id <= 27000
+    union all
+        select e.id,e.title,concat(b.name,' / ',d.name),'redundant or conflicting information about original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id inner join compilations c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.compilation_id inner join publishers q on q.entry_id = k.id and q.release_seq = 0 and q.publisher_seq = 1 inner join labels d on d.id = q.label_id where e.id > 27000
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
