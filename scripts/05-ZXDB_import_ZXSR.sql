@@ -3,6 +3,10 @@
 
 USE zxdb;
 
+-- BUGFIXES!
+update ssd.ssd_reviews set game_id = 8481 where review_id = 20923 and game_id = 8965;
+UPDATE ssd.ssd_reviews set game_id = 1976 where review_id = 4752 and game_id = 16628;
+
 -- Map SSD_Magazines(mag_id) from/to ZXDB.magazines(id)
 create table tmp_magazines(
   ssd_mag_id INT(11) NOT NULL primary key,
@@ -35,7 +39,9 @@ create table tmp_issues(
 insert into tmp_issues(ssd_issuecode, issue_id) values
 ((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = '1984 Annual' and m.mag_name = 'Sinclair User Annual'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'Sinclair User Annual' and i.date_year = 1984)),
 ((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue December 1984' and m.mag_name = 'ZX Collection'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'ZX Collection' and i.date_year = 1984)),
-((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue May 1986' and m.mag_name = 'Popular Computing Weekly Supplement'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is not null and m.name = 'Popular Computing Weekly' and i.number = 21));
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue May 1986' and m.mag_name = 'Popular Computing Weekly Supplement'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is not null and m.name = 'Popular Computing Weekly' and i.number = 21)),
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue September 1982' and m.mag_name = 'ZX Computing'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'ZX Computing' and i.date_year = 1982 and i.date_month = 8)),
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Top 50 Spectrum Software Classics' and m.mag_name = 'Sinclair User'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where m.name = 'Sinclair User' and i.supplement = 'Top 50 Spectrum Software Classics'));
 
 insert into tmp_issues(ssd_issuecode, issue_id) (select s.IssueCode,i.id from ssd.ssd_issues s inner join tmp_magazines t on t.ssd_mag_id = s.mag_id inner join issues i on i.magazine_id = t.magazine_id and s.Issue = concat('Issue ',i.number,', ',MONTHNAME(STR_TO_DATE(i.date_month, '%m')),' ',i.date_year) where i.parent_id is null and i.date_year is not null and i.date_month is not null and i.number is not null);
 
@@ -75,7 +81,7 @@ create table tmp_reviews (
 );
 
 insert into tmp_reviews(id, entry_id, issue_id, page, is_supplement, mag_section, review_text, review_comments, review_rating, reviewers, award_id) (
-select s.review_id, g.WOSID, i.issue_id,
+select s.review_id, s.game_id, i.issue_id,
 nullif(trim(substring_index(replace(replace(s.review_page,'(Supplement)',''),'.',','),',',1)),''),
 if (s.review_page like '%(Supplement)',1,0),
 m.mag_name,
@@ -85,7 +91,6 @@ nullif(replace(s.review_rating,'\r',''),''),
 nullif(s.reviewers,''),
 if (s.award_id<>999,s.award_id,null)
 from ssd.ssd_reviews s
-left join ssd.ssd_game g on g.ID = s.game_id
 left join tmp_issues i on s.issue_code=i.ssd_issuecode
 left join ssd.ssd_magazines m on m.mag_id = s.mag_type and m.mag_id between 7 and 18);
 
@@ -168,24 +173,21 @@ insert into zxsr_scores(magref_id, score_seq, category, is_overall, score, comme
 
 -- Add a reference to the compilation content's review in ZXDB if it's not already there
 insert into magrefs(referencetype_id, entry_id, issue_id, page)
-(select 10, g.WOSID, t.issue_id, t.page from ssd.ssd_reviews_scores_compilations c
-inner join ssd.ssd_game g on g.ID = c.game_id
+(select 10, c.game_id, t.issue_id, t.page from ssd.ssd_reviews_scores_compilations c
 inner join tmp_reviews t on c.review_id = t.id
 where c.score_id not in (
 select c.score_id from ssd.ssd_reviews_scores_compilations c
-inner join ssd.ssd_game g on g.ID = c.game_id
 inner join tmp_reviews t on c.review_id = t.id
-inner join magrefs r on g.WOSID = r.entry_id
+inner join magrefs r on c.game_id = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
 and r.referencetype_id = 10)
-group by g.WOSID, t.issue_id, t.page);
+group by c.game_id, t.issue_id, t.page);
 
 -- Store compilation content's review information in magrefs
 update ssd.ssd_reviews_scores_compilations c
-inner join ssd.ssd_game g on g.ID = c.game_id
 inner join tmp_reviews t on c.review_id = t.id
-inner join magrefs r on g.WOSID = r.entry_id
+inner join magrefs r on c.game_id = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
 and r.referencetype_id = 10
@@ -196,9 +198,8 @@ where 1=1;
 -- Store compilation content's review scores in ZXDB
 insert into zxsr_scores(magref_id, score_seq, category, is_overall, score) (select r.id, c.header_order, c.review_header, 0, nullif(concat(coalesce(trim(c.review_score),''),coalesce(trim(c.score_suffix),'')),'')
 from ssd.ssd_reviews_scores_compilations c
-inner join ssd.ssd_game g on g.ID = c.game_id
 inner join tmp_reviews t on c.review_id = t.id
-inner join magrefs r on g.WOSID = r.entry_id
+inner join magrefs r on c.game_id = r.entry_id
 and t.issue_id = r.issue_id
 and t.page = r.page
 and r.referencetype_id = 10 and
