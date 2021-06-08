@@ -22,7 +22,7 @@ select * from (
     union all
          select p.entry_id,e.title,p.publisher_seq-1,'skipped publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
-         select e.id,e.title,text,'** malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%')
+         select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%') or text regexp '[a-zA-Z]}'
     union all
          select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032)
     union all
@@ -62,7 +62,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link like '/zxdb/%' and d.file_link not like '%-load-%' and d.entry_id > 30407
     union all
-        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link like '/zxdb/%' and d.file_link not like '%-run-%' and d.entry_id > 30000
+        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link like '/zxdb/%' and d.file_link not like '%-run-%' and d.entry_id > 30000 and d.entry_id <> 37752
     union all
         select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link like '/zxdb/%' and d.file_link like '%-%' and d.file_link not like '%-open-%'
     union all
