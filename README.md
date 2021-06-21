@@ -76,6 +76,8 @@ The ZXDB schema is described below:
 
 * `aliases` - alternate titles for items (sometimes generic, sometimes just for a specific release and/or language)
 
+* `articles` - online articles about authors (profile, interview, memoir, etc)
+
 * `downloads` - available material related to a specific entry/release (screenshot, tape image, inlay, map, instructions, etc)
 
 * `extras` - lost files unrelated to entries or labels (FAQ, AY music, etc)
@@ -84,11 +86,7 @@ The ZXDB schema is described below:
 
 * `files` - available material related to a label (photos, posters, advertisements, etc), magazine issue (electronic magazine files, printed magazine scans, covertape music, etc), or cross-platform tool (installation files, instructions, etc)
 
-* `groups` - each group of programs with similar characteristics (participants in the same competition, based on the same original game, etc)
-
 * `hosts` - main services that provide information about certain features
-
-* `interviews` - website interviews provided by authors, publishers, etc
 
 * `issues` - each published issue of a magazine
 
@@ -105,6 +103,8 @@ The ZXDB schema is described below:
 * `scores` - average score received by each entry at main websites
 
 * `scraps` - obsolete files from the Original WorldOfSpectrum
+
+* `tags` - sets of programs with similar characteristics (participants in the same competition, based on the same original game, etc)
 
 * `topics` - catalogue of magazine sections
 
@@ -128,7 +128,7 @@ The ZXDB schema is described below:
 
 * `magreffeats` - associate magazine references to features
 
-* `members` - associate groups to their list of programs
+* `members` - associate tags to their list of programs
   * `series_seq` - only required for sequenced series
 
 * `permissions` - associate labels to distribution permissions granted to websites
@@ -149,6 +149,8 @@ The ZXDB schema is described below:
 
 #### _ENUMERATION TABLES_
 
+* `articletypes` - list of article types (profile, interview, memoir, etc)
+
 * `availabletypes` - list of availability status for entries:
   * `MIA` - released items not (yet) found/preserved
   * `Available` - released items already preserved
@@ -166,17 +168,6 @@ The ZXDB schema is described below:
 * `filetypes` - list of file types (screenshot, tape image, inlay, photo, poster, etc)
 
 * `genretypes` - list of entry types (program type, book type, hardware type, etc)
-
-* `grouptypes` - list of group types:
-  * `Series` - programs from the same series, following a specific order
-  * `Unsorted Group` - programs from the same collection, but without any specific order
-  * `Theme` - programs that share the same theme (Ancient Mythology, Christmas, etc)
-  * `Feature` - programs that share the same feature (isometric 3D graphics, AY support, etc)
-  * `Major Clone` - programs based on the same original game
-  * `Competition` - programs that participated in the same competition
-  * `Multiplay Mode` - programs that support a certain multiplayer mode (Cooperative, Teamplay, Versus)
-  * `Turn Mode` - programs that support a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
-  * `Control Option` - programs that support a certain control option (Kempston joystick, redefineable keys, etc)
 
 * `labeltypes` - list of label types (person, nickname, companies)
 
@@ -217,6 +208,16 @@ The ZXDB schema is described below:
 * `schemetypes` - tape protection schemes for programs
 
 * `sourcetypes` - indicates "source" of certain files (according to Martijn's internal notes)
+
+* `tagtypes` - list of tag types:
+  * `Series` - programs from the same series, following a specific order
+  * `Unsorted Group` - programs from the same collection, but without any specific order
+  * `Theme` - programs that share the same theme (Ancient Mythology, Christmas, etc)
+  * `Feature` - programs that share the same feature (isometric 3D graphics, AY support, etc)
+  * `Competition` - programs that participated in the same competition
+  * `Multiplay Mode` - programs that support a certain multiplayer mode (Cooperative, Teamplay, Versus)
+  * `Turn Mode` - programs that support a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
+  * `Control Option` - programs that support a certain control option (Kempston joystick, redefineable keys, etc)
 
 * `tooltypes` - list of tool types (emulator, cross-development utility, etc)
 

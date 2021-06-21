@@ -37,7 +37,7 @@ create table tmp_issues(
 );
 
 insert into tmp_issues(ssd_issuecode, issue_id) values
-((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = '1984 Annual' and m.mag_name = 'Sinclair User Annual'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'Sinclair User Annual' and i.date_year = 1984)),
+((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = '1984 Annual' and m.mag_name = 'Sinclair User Annual'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'Sinclair User' and i.special = 'Annual 1984')),
 ((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue December 1984' and m.mag_name = 'ZX Collection'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'ZX Collection' and i.date_year = 1984)),
 ((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue May 1986' and m.mag_name = 'Popular Computing Weekly Supplement'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is not null and m.name = 'Popular Computing Weekly' and i.number = 21)),
 ((select s.IssueCode from ssd.ssd_issues s inner join ssd.ssd_magazines m on m.mag_id=s.mag_id where s.Issue = 'Issue September 1982' and m.mag_name = 'ZX Computing'),(select i.id from issues i inner join magazines m on i.magazine_id = m.id where i.parent_id is null and m.name = 'ZX Computing' and i.date_year = 1982 and i.date_month = 8)),
