@@ -80,8 +80,6 @@ The ZXDB schema is described below:
 
 * `downloads` - available material related to a specific entry/release (screenshot, tape image, inlay, map, instructions, etc)
 
-* `extras` - lost files unrelated to entries or labels (FAQ, AY music, etc)
-
 * `features` - magazine sections that featured certain entry or label references
 
 * `files` - available material related to a label (photos, posters, advertisements, etc), magazine issue (electronic magazine files, printed magazine scans, covertape music, etc), or cross-platform tool (installation files, instructions, etc)
@@ -118,15 +116,15 @@ The ZXDB schema is described below:
 
 * `booktypeins` - associate typed-in programs to the books that published them
 
-* `compilations` - associate compilations to their list of programs
+* `contents` - associate list of programs contained in compilations, covertapes or electronic magazines
 
 * `licensors` - associate licenses to their license owners
 
 * `magrefs` - associate entries or labels to pages from magazine issues about them (magazine references)
 
-* `magreflinks` - associate magazine references to links about them
-
 * `magreffeats` - associate magazine references to features
+
+* `magreflinks` - associate magazine references to links about them
 
 * `members` - associate tags to their list of programs
   * `series_seq` - only required for sequenced series
@@ -158,6 +156,8 @@ The ZXDB schema is described below:
   * `Distribution denied - still for sale` - items unauthorized for distribution
   * `Never released` - items never released (for whatever reason)
   * `Never released - recovered` - items never officially released, later recovered/preserved
+
+* `contenttypes` - list of content types in compilations, covertapes or electronic magazines (full version, demo, soundtrack only, etc)
 
 * `countries` - list of countries (using ISO 3166-1 Alpha-2 standard codes)
 
@@ -222,8 +222,6 @@ The ZXDB schema is described below:
 * `tooltypes` - list of tool types (emulator, cross-development utility, etc)
 
 * `topictypes` - magazine section types
-
-* `variationtypes` - list of possible item variations (full version, demo, or soundtrack only)
 
 
 #### _ZXSR TABLES_
