@@ -90,12 +90,6 @@ select * from (
     union all
         select e.id,e.title,t.text,'container that is not compilation, covertape or electronic magazine' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select container_id from contents) and e.id not in (select container_id from contents where container_id = entry_id) and (e.genretype_id is null or e.genretype_id < 80)
     union all
-        select e.id,e.title,t.text,'** published program without magazine or book reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'T' and e.id not in (select entry_id from magrefs where referencetype_id = 0) and e.id not in (select entry_id from booktypeins)
-    union all
-        select e.id,e.title,t.text,'** published program without covertape reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'M' and e.id not in (select c.entry_id from contents c inner join entries k on c.container_id = k.id where c.entry_id is not null and k.genretype_id in (81,82))
-    union all
-        select e.id,e.title,t.text,'** published program without compilation reference' from entries e inner join publicationtypes t on e.publicationtype_id = t.id where t.id = 'C' and e.id not in (select entry_id from contents where entry_id is not null)
-    union all
         select e.id,e.title,t.text,'** program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
     union all
         select e.id,e.title,text,'** programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
@@ -148,21 +142,15 @@ select * from (
     union all
         select e.id,e.title,t.text,'title cannot have multiple origins' from entries e inner join relations r1 on r1.entry_id = e.id inner join relationtypes t on t.id = r1.relationtype_id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = r1.relationtype_id and r2.original_id > r1.original_id where t.id in ('p','u')
     union all
-        select e.id,e.title,t.text,'** this title cannot have an independent original price since it was not originally published independently' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join publicationtypes t on t.id = e.publicationtype_id where (r.release_price is not null and r.release_price <> 'Free (Freeware)') or r.budget_price is not null or r.microdrive_price is not null or r.disk_price is not null or r.cartridge_price is not null
-    union all
-        select e.id,e.title,concat(k.title,' / ',k2.title),'multiple original publications' from entries e inner join contents c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.container_id inner join contents c2 on c2.entry_id = e.id and c2.is_original = 1 and c2.container_id <> c.container_id inner join entries k2 on k2.id = c2.container_id
+        select e.id,e.title,null,'** title cannot have an independent original price since it was not originally published independently' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where r.currency_id is not null and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from magrefs where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1))
     union all
         select e.id,e.title,concat(r.release_year,' x ',rk.release_year),'** conflicting dates for original publication' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents c on c.entry_id = e.id and c.is_original = 1 inner join releases rk on rk.entry_id = c.container_id and rk.release_seq = 0 where r.release_year <> rk.release_year or r.release_month <> rk.release_month or r.release_day <> rk.release_day
-    union all
-        select e.id,e.title,b.name,'** direct information about indirect original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id where e.publicationtype_id is not null and e.publicationtype_id <> 'T'
-    union all
-        select e.id,e.title,k.title,concat('** originally published in ',upper(t.text),' instead of ',substring_index(upper(p.text), ' ', -1)) from entries e inner join contents c on e.id = c.entry_id and c.is_original = 1 inner join entries k on k.id = c.container_id inner join genretypes t on k.genretype_id = t.id inner join publicationtypes p on e.publicationtype_id = p.id where (e.publicationtype_id = 'E' and k.genretype_id <> 82) or (e.publicationtype_id = 'M' and k.genretype_id <> 81) or (e.publicationtype_id = 'C' and k.genretype_id in (81,82))
     union all
         select e.id,e.title,t.text,'** missing list of contents' as todo from entries e inner join genretypes t on e.genretype_id = t.id where (e.genretype_id in (80,81) or e.genretype_id >= 110) and e.id not in (select container_id from contents)
     union all
         select e.id,e.title,d.file_link,'itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
     union all
-        select e.id,e.title,c.container_id,'redundant alias in compilation' from entries e inner join contents c on e.id = c.entry_id where e.title = c.alias
+        select e.id,e.title,c.container_id,'redundant alias in contents' from entries e inner join contents c on e.id = c.entry_id where e.title = c.alias
     union all
         select e.id,e.title,t.text,'possibly misclassified Game Editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
     union all
@@ -173,15 +161,9 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select null,null,concat(m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id where i.id in (select j.id from magrefs r inner join issues j on r.issue_id = j.id where r.page < j.cover_page)
     union all
-        select e.id,e.title,t.text,'** conflicting information about original publication' from entries e left join publicationtypes t on t.id = e.publicationtype_id where (e.publicationtype_id is null or e.publicationtype_id not in ('C','E','M')) and e.id in (select entry_id from contents where is_original = 1)
+        select x.id,x.title,concat(nc+nr+nb,' original publications'),'multiple original publications' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct i.magazine_id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join issues i on r.issue_id = i.id left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x where nc+nr+nb > 1
     union all
-        select e.id,e.title,t.text,'** unidentified original publication' from entries e inner join publicationtypes t on t.id = e.publicationtype_id where e.publicationtype_id in ('C','E','M') and e.id not in (select entry_id from contents where is_original = 1)
-    union all
-        select x.id,x.title,concat(nc+nr+nb,' original publications'),'multiple original publications' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct r.id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x where nc+nr+nb > 1 and id not in (16691)
-    union all
-        select x.id,x.title,a.name,'** conflicting information about original publication' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct r.id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x inner join publishers p on p.entry_id = x.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels a on a.id = p.label_id where nc+nr+nb > 0
-    union all
-        select e.id,e.title,concat(b.name,' / ',d.name),'** redundant or conflicting information about original publisher' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels b on b.id = p.label_id inner join contents c on c.entry_id = e.id and c.is_original = 1 inner join entries k on k.id = c.container_id inner join publishers q on q.entry_id = k.id and q.release_seq = 0 and q.publisher_seq = 1 inner join labels d on d.id = q.label_id
+        select x.id,x.title,a.name,'** redundant or conflicting information about original publisher' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct r.id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x inner join publishers p on p.entry_id = x.id and p.release_seq = 0 and p.publisher_seq = 1 inner join labels a on a.id = p.label_id where nc+nr+nb > 0
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
