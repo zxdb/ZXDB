@@ -194,11 +194,6 @@ The ZXDB schema is described below:
 
 * `platforms` - list of computer platforms
 
-* `publicationtypes` - possible publication types for certain programs:
-  * `As part of a compilation` - program was originally released as part of a compilation
-  * `On magazine covertape` - program was originally released on magazine covertape
-  * `Type-in` - program was originally released as type-in (from book or magazine)
-
 * `referencetypes` - references from magazines about entries or labels (preview, review, advert, type-in, solution, etc)
 
 * `relationtypes` - types of relationships between programs (inspired by, authored with, etc)
