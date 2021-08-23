@@ -56,9 +56,9 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
     union all
-        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id between 1 and 3 and d.scr_border<>7
+        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id between 1 and 3 and d.scr_border<>7
     union all
-        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 23 and d.filetype_id = 1
+        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id = 1
     union all
         select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link like '/zxdb/%' and d.file_link not like '%-load-%' and d.entry_id > 30407
     union all
@@ -69,8 +69,6 @@ select * from (
         select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'')
     union all
         select null,null,concat(m.name,' ',i1.date_year,'/',i1.date_month),'duplicated magazine issue' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number is null and i2.number is null and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'') and coalesce(i1.date_year,-1) = coalesce(i2.date_year,-1) and coalesce(i1.date_month,-1) = coalesce(i2.date_month,-1) and coalesce(i1.date_day,-1) = coalesce(i2.date_day,-1)
-    union all
-        select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' supplement'),'** unidentified magazine issue supplement' from issues i inner join magazines m on m.id = i.magazine_id where i.parent_id is not null and i.supplement = 'supplement'
     union all
         select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent_id is not null
     union all
@@ -118,6 +116,8 @@ select * from (
     union all
         select e.id,e.title,g.text,'entry linked to magazine must be Covertape or Electronic Magazine' from entries e inner join issues i on i.id = e.issue_id left join genretypes g on e.genretype_id = g.id where e.title not like 'DigiTape%' and i.magazine_id <> 323 and (e.genretype_id is null or e.genretype_id not in (81,82))
     union all
+        select null,null,name,'magazine cannot be both paper and electronic' from magazines where id in (select magazine_id from entries e inner join issues i on e.issue_id = i.id where e.genretype_id = 82) and (link_mask is not null or archive_mask is not null)
+    union all
         select e.id,e.title,concat(b2.name,' / ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where (b1.owner_id = b2.id or (b1.id < b2.id and b1.labeltype_id = '-' and b2.labeltype_id = '-' and b1.owner_id = b2.owner_id)) and e.id not in (4448,15020)
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
@@ -134,7 +134,7 @@ select * from (
     union all
         select null,null,concat(name,' (',id,')'),'** missing list of magazine issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
     union all
-        select e.id,e.title,concat(r.release_year,'/',coalesce(r.release_month,'-'),'/',coalesce(r.release_day,'-')),'mismatching dates between tape and magazine' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on i.id = e.issue_id where r.release_year <> i.date_year or r.release_month <> i.date_month or r.release_day <> i.date_day
+        select e.id,e.title,concat(coalesce(r.release_year,'-'),'/',coalesce(r.release_month,'-'),'/',coalesce(r.release_day,'-'),' vs ',coalesce(i.date_year,'-'),'/',coalesce(i.date_month,'-'),'/',coalesce(i.date_day,'-')),'mismatch between tape and magazine dates' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on i.id = e.issue_id where coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1)
     union all
         select e.id,e.title,n.text,'** note probably conversible to license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Based%'
     union all
@@ -157,7 +157,7 @@ select * from (
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
 r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
     union all
-        select null,null,concat(m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id where i.id in (select j.id from magrefs r inner join issues j on r.issue_id = j.id where r.page < j.cover_page)
+        select e.id,e.title,concat(t.text,': ',m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id inner join magrefs r on r.issue_id = i.id inner join referencetypes t on r.referencetype_id = t.id left join entries e on e.id = r.entry_id where r.page < i.cover_page
     union all
         select x.id,x.title,concat(nc+nr+nb,' original publications'),'multiple original publications' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct i.magazine_id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join issues i on r.issue_id = i.id left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x where nc+nr+nb > 1
     union all
