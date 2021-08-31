@@ -4,8 +4,12 @@
 USE zxdb;
 
 -- BUGFIXES!
-update ssd.ssd_reviews set game_id = 8481 where review_id = 20923 and game_id = 8965;
-UPDATE ssd.ssd_reviews set game_id = 1976 where review_id = 4752 and game_id = 16628;
+-- update ssd.ssd_reviews set game_id = 8481 where review_id = 20923 and game_id = 8965;
+-- update ssd.ssd_reviews set game_id = 1976 where review_id = 4752 and game_id = 16628;
+-- update ssd.ssd_reviews set game_id = 5106 where game_id = 10675;
+-- update ssd.ssd_reviews set game_id = 11417 where game_id = 12197;
+-- update ssd.ssd_reviews set game_id = 9914 where game_id = 15920;
+-- update ssd.ssd_reviews set game_id = 5007 where game_id = 26392;
 
 -- Map SSD_Magazines(mag_id) from/to ZXDB.magazines(id)
 create table tmp_magazines(

@@ -3,7 +3,6 @@
 
 USE zxdb;
 
-
 -- Help search for entries (programs, books, computers and peripherals) by title or aliases (in lower case without space or punctuation)
 
 drop table if exists search_by_titles;
@@ -120,5 +119,64 @@ select * from entries where id in (select entry_id from search_by_authors a inne
 -- Example: Search for all entries published by someone with name similar to "zxsoftbr"
 select * from entries where id in (select entry_id from search_by_publishers p inner join search_by_names n on p.label_id = n.label_id where label_name like '%zxsoftbr%') order by title;
 
+
+-- Help identify magazine issues, original release dates and original publishers
+
+drop table if exists aux_origins;
+drop table if exists aux_origintypes;
+drop table if exists aux_issues;
+
+create table aux_issues (
+  issue_id int(11) not null primary key,
+  text varchar(300) not null
+);
+
+insert into aux_issues(issue_id, text) (select id, trim(concat(if(volume is not null,concat('v.',volume),''),if(number is not null,concat(' #',number),''),if(date_year is not null,concat(' - ',date_year,if(date_month is not null,concat('/',date_format(str_to_date(date_month,'%m'),'%b'),if(date_day is not null,concat('/',date_day),'')),'')),''),if(special is not null,concat(' special "',special,'"'),''),if(supplement is not null,concat(' supplement "',supplement,'"'),''))) from issues);
+
+create table aux_origintypes (
+  id char(1) not null primary key,
+  text varchar(50) not null unique
+);
+
+insert into aux_origintypes(id, text) values
+('C', 'covertape from magazine issue'),
+('B', 'type-in from book'),
+('M', 'type-in from magazine issue'),
+('A', 'within compilation'),
+('T', 'within covertape'),
+('E', 'within electronic magazine'),
+('P', 'within program');
+
+create table aux_origins (
+  entry_id int(11) not null primary key,
+  origintype_id char(1) not null,
+  container_id int(11),
+  issue_id int(11),
+  date_year smallint(6),
+  date_month smallint(6),
+  date_day smallint(6),
+  publication varchar(300),
+  constraint fk_aux_origin_type foreign key (origintype_id) references aux_origintypes(id),
+  index (container_id),
+  index (issue_id)
+);
+
+-- Covertapes
+insert into aux_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select e.id, 'C', null, e.issue_id, i.date_year, i.date_month, i.date_day from entries e inner join issues i on e.issue_id = i.id where e.genretype_id = 81 and e.id not in (select entry_id from aux_origins));
+
+-- Book type-ins
+insert into aux_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select b.entry_id, 'B', b.book_id, null, r.release_year, r.release_month, r.release_day from booktypeins b inner join entries e on b.book_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 where b.is_original = 1 and b.entry_id not in (select entry_id from aux_origins));
+
+-- Magazine type-ins
+insert into aux_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select x.entry_id, 'M', null, x.issue_id, i.date_year, i.date_month, i.date_day from (select entry_id, min(r.issue_id) as issue_id from magrefs r where r.is_original = 1 group by r.entry_id) as x inner join issues i on x.issue_id = i.id where x.entry_id not in (select entry_id from aux_origins));
+
+-- Within covertape
+insert into aux_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, 'T', c.container_id, i.id, i.date_year, i.date_month, i.date_day from contents c inner join entries e on c.container_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on e.issue_id = i.id where c.is_original = 1 and e.genretype_id = 81 and c.entry_id not in (select entry_id from aux_origins) group by c.entry_id);
+
+-- Within all
+insert into aux_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, (case when e.genretype_id in (80,111,112,113,114) then 'A' when e.genretype_id = 81 then 'T' when e.genretype_id = 82 then 'E' else 'P' end), c.container_id, null, r.release_year, r.release_month, r.release_day from contents c inner join entries e on c.container_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 where c.is_original = 1 and c.entry_id not in (select entry_id from aux_origins) group by c.entry_id);
+
+-- Original publication
+update aux_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(e.title is not null,concat('"',e.title,'"'),if(i.id is not null,s.text,'?'))) as publication from aux_origins x inner join aux_origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join aux_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries e on x.container_id = e.id left join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
 
 -- END
