@@ -8,7 +8,7 @@ select * from (
     union all
         select id,title,'0','no release number in releases' from entries where id not in (select entry_id from releases)
     union all
-        select e.id,e.title,r.release_seq-1,'** skipped release number in releases' from releases r inner join entries e on r.entry_id = e.id where r.release_seq > 0 and r.release_seq-1 not in (select r2.release_seq from releases r2 where r2.entry_id = r.entry_id)
+        select e.id,e.title,r.release_seq-1,'skipped release number in releases' from releases r inner join entries e on r.entry_id = e.id where r.release_seq > 0 and r.release_seq-1 not in (select r2.release_seq from releases r2 where r2.entry_id = r.entry_id)
     union all
         select id,title,library_title,'possible mismatch between title and library title' from entries where title <> library_title and left(title,4) = left(library_title,4) and title not like '%+%'
     union all

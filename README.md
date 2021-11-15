@@ -2,7 +2,7 @@
 
 ZXDB is an open database containing historical information of software, hardware, magazines and books about ZX-Spectrum and related machines.
 
-It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), and **Chris Bourne**'s [ZXSR](http://www.zxspectrumreviews.co.uk/) archives (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
+It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), **Daren Pearcy**'s [RZX Archive](http://www.rzxarchive.co.uk/), and **Chris Bourne**'s [ZXSR](http://www.zxspectrumreviews.co.uk/) repositories (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
 
 For further details, visit the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) at [Spectrum Computing](https://spectrumcomputing.co.uk/).
 
@@ -286,6 +286,8 @@ Also special thanks to everyone that contributed to the creation of ZXDB, partic
 * **Martijn van der Heide**: for creating and maintaining the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) archive, and directly helping to import it into ZXDB (clarifying our trickiest questions about the most obscure flags in the [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/) internal files).
 
 * **Jim Grimwood**: for creating and maintaining the original [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/) archive.
+
+* **Daren Pearcy**: for creating and maintaining the original [RZX Archive](http://www.rzxarchive.co.uk/).
 
 * **Chris Bourne**: for creating and maintaining the original [ZXSR](http://www.zxspectrumreviews.co.uk/) archive.
 
