@@ -149,7 +149,7 @@ select * from (
         select e.id,e.title,t.text,'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
     union all
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
-r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
+r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
     union all
         select e.id,e.title,concat(t.text,': ',m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id inner join magrefs r on r.issue_id = i.id inner join referencetypes t on r.referencetype_id = t.id left join entries e on e.id = r.entry_id where r.page < i.cover_page
     union all
