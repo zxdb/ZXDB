@@ -149,7 +149,7 @@ select * from (
         select e.id,e.title,t.text,'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
     union all
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
-r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
+r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36,37) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
     union all
         select e.id,e.title,concat(t.text,': ',m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id inner join magrefs r on r.issue_id = i.id inner join referencetypes t on r.referencetype_id = t.id left join entries e on e.id = r.entry_id where r.page < i.cover_page
     union all
@@ -158,6 +158,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select x.id,x.title,concat(nc+nr+nb,' original publications'),'multiple original publications' from (select e.id, e.title, count(distinct c.container_id) as nc, count(distinct i.magazine_id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join issues i on r.issue_id = i.id left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x where nc+nr+nb > 1
     union all
         select e.id,e.title,null,'** redundant or conflicting information about original publication (date, publisher or price)' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = r.entry_id and p.release_seq = r.release_seq where (r.release_year is not null or r.currency_id is not null or p.label_id is not null) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
+    union all
+        select e.id,e.title,text,'note text to be fixed' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;

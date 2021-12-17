@@ -12,8 +12,6 @@ select * from (
     union all
         select e.id,e.title,n.text,'convert note into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
     union all
-        select e.id,e.title,text,'fix text in notes' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
-    union all
         select null,null,file_link,'identify file to be moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'review from major magazine missing from ZXSR' from magrefs r inner join issues i on i.id = r.issue_id inner join magazines m on m.id = i.magazine_id inner join entries e on e.id = r.entry_id where r.referencetype_id = 10 and r.review_id is null and m.id in (select i.magazine_id from magrefs r inner join issues i on i.id = r.issue_id where r.referencetype_id = 10 and r.review_id is not null) and r.id not in (select magref_id from magreffeats where feature_id = 6455) and (e.machinetype_id is null or e.machinetype_id <= 10)
