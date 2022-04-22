@@ -160,6 +160,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,null,'** redundant or conflicting information about original publication (date, publisher or price)' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = r.entry_id and p.release_seq = r.release_seq where (r.release_year is not null or r.currency_id is not null or p.label_id is not null) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
     union all
         select e.id,e.title,text,'note text to be fixed' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
+    union all
+        select e.id,e.title,n.text,'mismatching magazine reference' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Appeared on issue%'
 ) as errors
 where error not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
