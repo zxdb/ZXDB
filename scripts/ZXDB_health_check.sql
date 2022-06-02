@@ -80,7 +80,9 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
     union all
-        select null,null,concat(t.text,': ',name,' (',g.id,')'),'tag without any members' from tags g inner join tagtypes t on t.id = g.tagtype_id where g.id not in (select tag_id from members)
+        select null,null,concat(t.text,': ',g.name,' (',g.id,')'),'tag without any members' from tags g inner join tagtypes t on t.id = g.tagtype_id where g.id not in (select tag_id from members)
+    union all
+        select e.id,e.title,concat(t.text,': ',g.name,' (',g.id,')'),'series (or set) with a single title' from tags g inner join tagtypes t on g.tagtype_id = t.id inner join members m on m.tag_id = g.id inner join entries e on m.entry_id = e.id left join members m2 on m2.tag_id = g.id and m2.entry_id <> m.entry_id where m2.entry_id is null and t.id in ('S','U')
     union all
         select null,null,concat('License: ',name,' (',id,')'),'license without any entries' from licenses where id not in (select license_id from relatedlicenses)
     union all
