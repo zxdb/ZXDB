@@ -4,7 +4,7 @@
 USE zxdb;
 
 select * from (
-        select a.entry_id,e.title,a.author_seq-1 as details,'skipped author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
+        select a.entry_id,e.title,a.author_seq-1 as details,'skipped author sequence in authors' as warning from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
         select id,title,'0','no release number in releases' from entries where id not in (select entry_id from releases)
     union all
@@ -12,27 +12,29 @@ select * from (
     union all
         select id,title,library_title,'possible mismatch between title and library title' from entries where title <> library_title and left(title,4) = left(library_title,4) and title not like '%+%'
     union all
-         select e.id,e.title,concat(c.media_seq,'-',c.media_side,'-',c.prog_seq-1),'skipped item in contents' from contents c inner join entries e on c.container_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from contents c2 where c2.container_id = c.container_id and c2.media_seq = c.media_seq and c2.media_side = c.media_side)
+        select e.id,e.title,concat(c.media_seq,'-',c.media_side,'-',c.prog_seq-1),'skipped item in contents' from contents c inner join entries e on c.container_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from contents c2 where c2.container_id = c.container_id and c2.media_seq = c.media_seq and c2.media_side = c.media_side)
     union all
-         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.tagtype_id = 'S'
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.tagtype_id = 'S'
     union all
-         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'** skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.tag_id = m.tag_id)
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'** skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.tag_id = m.tag_id)
     union all
-         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.tagtype_id <> 'S'
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.tagtype_id <> 'S'
     union all
-         select p.entry_id,e.title,p.publisher_seq-1,'skipped publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
+        select p.entry_id,e.title,p.publisher_seq-1,'skipped publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
-         select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%') or text regexp '[a-zA-Z]}'
+        select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%') or text regexp '[a-zA-Z]}'
     union all
-         select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032)
+        select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032)
     union all
-         select e.id,e.title,g.text,'** game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
+        select e.id,e.title,g.text,'** game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
-         select null,null,b1.name,'** possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null
+        select null,null,b1.name,'** possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null
     union all
-         select e1.id,e1.title,null,'** possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
+        select e1.id,e1.title,null,'** possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
     union all
-         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
+        select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
+    union all
+        select e.id,e.title,concat(b.name,' / ',t.name),'** team member must be a person' from entries e inner join authors a on e.id = a.entry_id inner join labels b on a.label_id = b.id inner join labels t on a.team_id = t.id where b.labeltype_id not in ('+','-')
     union all
         select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
     union all
@@ -58,7 +60,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id between 1 and 3 and d.scr_border<>7
     union all
-        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id = 1
+        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id = 1 and e.id not in (31929)
     union all
         select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link like '/zxdb/%' and d.file_link not like '%-load-%' and d.entry_id > 30407
     union all
@@ -162,10 +164,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,null,'** redundant or conflicting information about original publication (date, publisher or price)' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = r.entry_id and p.release_seq = r.release_seq where (r.release_year is not null or r.currency_id is not null or p.label_id is not null) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
     union all
         select e.id,e.title,text,'note text to be fixed' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
-    union all
-        select e.id,e.title,n.text,'mismatching magazine reference' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Appeared on issue%'
-) as errors
-where error not like '**%' -- remove this line to see all potential problems!
+) as warnings
+where warning not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;
 
 -- END
