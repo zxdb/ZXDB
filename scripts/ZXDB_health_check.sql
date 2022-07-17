@@ -16,7 +16,7 @@ select * from (
     union all
         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.tagtype_id = 'S'
     union all
-        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'** skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.tag_id = m.tag_id)
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.tag_id = m.tag_id)
     union all
         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.tagtype_id <> 'S'
     union all
@@ -26,7 +26,7 @@ select * from (
     union all
         select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032)
     union all
-        select e.id,e.title,g.text,'** game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
+        select e.id,e.title,g.text,'game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
         select null,null,b1.name,'** possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null
     union all
@@ -96,8 +96,6 @@ select * from (
     union all
         select e.id,e.title,text,'** aliases must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'aka. %' or text like 'a.k.a. %'
     union all
-        select e.id,e.title,text,'** derived versions must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'An updated version of %' and e.id not in (select entry_id from relations where relationtype_id = 'u')
-    union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from contents where entry_id is not null) or id in (select container_id from contents) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs))
     union all
         select e.id,e.title,d.file_link,'** probably demo version not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
@@ -128,7 +126,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
     union all
-         select null,null,concat('/zxdb/sinclair/entries/.../',filename),'** duplicated filename' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
+         select null,null,concat('/zxdb/sinclair/entries/.../',filename),'** duplicated filename (to be avoided if possible)' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
     union all
          select id,title,null,'deprecated title without related original title' from entries where id not in (select entry_id from relations where relationtype_id = '*') and availabletype_id = '*'
     union all
@@ -148,9 +146,9 @@ select * from (
     union all
         select e.id,e.title,c.container_id,'redundant alias in contents' from entries e inner join contents c on e.id = c.entry_id where e.title = c.alias
     union all
-        select e.id,e.title,t.text,'possibly misclassified Game Editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
+        select e.id,e.title,t.text,'possibly misclassified game editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
     union all
-        select e.id,e.title,t.text,'Game Editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
+        select e.id,e.title,t.text,'game editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
     union all
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
 r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36,37) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
@@ -167,7 +165,11 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select e.id,e.title,null,'** conflicting information about original price' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where r.currency_id is not null and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
     union all
-        select e.id,e.title,text,'note text to be fixed' from notes n left join entries e on e.id = n.entry_id where text <> replace(text,'\\ ',' ')
+        select e.id,e.title,n.text,'** note to be converted into compilation or relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Came%'
+    union all
+        select e.id,e.title,n.text,'** note to be converted into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
+    union all
+        select null,null,file_link,'** file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
 ) as warnings
 where warning not like '**%' -- remove this line to see all potential problems!
 order by entry_id, details;

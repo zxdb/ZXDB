@@ -12,6 +12,7 @@ USE zxdb;
 -- update ssd.ssd_reviews set game_id = 5007 where game_id = 26392;
 -- update ssd.ssd_reviews set game_id = 12286 where game_id = 8737;
 -- update ssd.ssd_reviews set game_id = 4579 where game_id = 4578;
+-- update ssd.ssd_reviews set game_id = 5810 where game_id = 10612;
 
 -- Map SSD_Magazines(mag_id) from/to ZXDB.magazines(id)
 create table tmp_magazines(
