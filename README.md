@@ -239,6 +239,22 @@ Local file links starting with `/pub/sinclair/` refer to content previously avai
 Local file links starting with `/zxdb/sinclair/` refer to content added afterwards. These files are currently stored at https://spectrumcomputing.co.uk/zxdb/sinclair/
 
 
+## Concepts
+
+#### About "releases"
+
+Each release in ZXDB corresponds to an individual publication of a certain product (program, book, etc) as follows:
+
+* Release #0 is the original release
+* Release #1 is the 1st re-release
+* Release #2 is the 2nd re-release
+* etc
+
+Normally it doesn't count as release when a product re-appears in non-individual publications, such as included in a compilation, covertape, electronic magazine, bonus B-side of another program, printed as book or magazine type-in. For instance [Target Renegade](https://spectrumcomputing.co.uk/entry/4087) was originally published by **Imagine** (release #0), later re-published by **Erbe** (release #1) and **Hit Squad** (release #2). It was also included in a few compilations and covertapes, but none of them count as individual releases. Another example is [Showdown](https://spectrumcomputing.co.uk/entry/4483) that was originally published by **Artic Computing** and later re-appeared in **Your Spectrum** as type-in, but the **Your Spectrum** publication is not considered a release.
+
+However there's an exception to this rule. If a certain program was _not originally published individually_ (i.e it was originally published within a [compilation](https://spectrumcomputing.co.uk/entry/9340), [covertape](https://spectrumcomputing.co.uk/entry/2420), [electronic magazine](https://spectrumcomputing.co.uk/entry/399), [bonus B-side of another program](https://spectrumcomputing.co.uk/entry/5675), printed as [book type-in](https://spectrumcomputing.co.uk/entry/17668) or [magazine type-in](https://spectrumcomputing.co.uk/entry/13286)), then release #0 should reflect this information. Technically it means assigning a blank release #0 to this title (without publisher, release date or price), and flagging the original appearance of this program elsewhere as "original".
+
+
 ## Disclaimer
 
 * _Copyright_: ZXDB doesn't contain any copyrighted content. ZXDB is a database containing metadata information only. It doesn't store any kind of copyrighted material internally.
