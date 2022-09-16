@@ -179,7 +179,7 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select null,null,file_link,'** file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
-        select null,null,m.name,'** label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Kiddisoft','Gamestar')
+        select null,null,m.name,'** label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
     union all
         select null,null,concat(b.name,' [',c.text,'] x ',b2.name,' [',c2.text,']'),'mismatching countries' from labels b inner join countries c on b.country_id = c.id inner join labels b2 on b.owner_id = b2.id inner join countries c2 on b2.country_id = c2.id where b.labeltype_id='-' and c.id <> c2.id
 ) as warnings
