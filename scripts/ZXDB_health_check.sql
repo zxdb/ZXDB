@@ -177,6 +177,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select e.id,e.title,n.text,'** note to be converted into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
     union all
+        select e.id,e.title,n.text,'** note to be converted into relation or license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion of%'
+    union all
         select null,null,file_link,'** file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select null,null,m.name,'** label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
