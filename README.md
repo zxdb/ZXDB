@@ -186,6 +186,8 @@ The ZXDB schema is described below:
 
 * `notetypes` - list of note types (awards, errors, etc)
 
+* `origintypes` - list of indirect original publication types (covertape from magazine, type-in from book, etc)
+
 * `permissiontypes` - permission types:
   * `Allowed` - copyright owner allowed distribution permission for all titles
   * `Denied` - copyright owner denied distribution permission for all titles

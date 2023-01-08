@@ -122,34 +122,28 @@ select * from entries where id in (select entry_id from search_by_publishers p i
 
 -- Fancy names for magazine issues
 
-drop table if exists aux_issues;
+drop table if exists search_by_issues;
 
-create table aux_issues (
+create table search_by_issues (
   issue_id int(11) not null primary key,
   name varchar(300) not null
 );
 
-insert into aux_issues(issue_id, name) (select id, trim(concat(if(volume is not null,concat('v.',volume),''),if(number is not null,concat(' #',number),''),if(date_year is not null,concat(' - ',date_year,if(date_month is not null,concat('/',date_format(str_to_date(date_month,'%m'),'%b'),if(date_day is not null,concat('/',date_day),'')),'')),''),if(special is not null,concat(' special "',special,'"'),''),if(supplement is not null,concat(' supplement "',supplement,'"'),''))) from issues);
+insert into search_by_issues(issue_id, name) (select id, trim(concat(if(volume is not null,concat('v.',volume),''),if(number is not null,concat(' #',number),''),if(date_year is not null,concat(' - ',date_year,if(date_month is not null,concat('/',date_format(str_to_date(date_month,'%m'),'%b'),if(date_day is not null,concat('/',date_day),'')),'')),''),if(special is not null,concat(' special "',special,'"'),''),if(supplement is not null,concat(' supplement "',supplement,'"'),''))) from issues);
 
 
--- Original publication types
+-- Help search for magazine publishers
 
-drop table if exists aux_origins;
-drop table if exists aux_origintypes;
+drop table if exists search_by_magazines;
 
-create table aux_origintypes (
-  id char(1) not null primary key,
-  text varchar(50) not null unique
+create table search_by_magazines (
+    magazine_id smallint(6) not null,
+    label_id int(11) not null,
+    primary key (magazine_id, label_id),
+    index (label_id)
 );
 
-insert into aux_origintypes(id, text) values
-('C', 'covertape from magazine issue'),
-('B', 'type-in from book'),
-('M', 'type-in from magazine issue'),
-('A', 'within compilation'),
-('T', 'within covertape'),
-('E', 'within electronic magazine'),
-('P', 'within program');
+insert into search_by_magazines (magazine_id, label_id) (select magazine_id, lid from (select magazine_id, label_id as lid from issues where label_id is not null union all select magazine_id, label2_id as lid from issues where label2_id is not null) as x group by magazine_id, lid);
 
 
 -- Help search for original publication details
@@ -186,6 +180,29 @@ insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, d
 insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, (case when e.genretype_id in (80,111,112,113,114) then 'A' when e.genretype_id = 81 then 'T' when e.genretype_id = 82 then 'E' else 'P' end), c.container_id, null, r.release_year, r.release_month, r.release_day from contents c inner join entries e on c.container_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 where c.is_original = 1 and c.entry_id not in (select entry_id from search_by_origins) group by c.entry_id);
 
 -- Original publication
-update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(e.title is not null,concat('"',e.title,'"'),if(i.id is not null,s.name,'?'))) as publication from search_by_origins x inner join aux_origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join aux_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries e on x.container_id = e.id left join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
+update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(e.title is not null,concat('"',e.title,'"'),if(i.id is not null,s.name,'?'))) as publication from search_by_origins x inner join origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join search_by_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries e on x.container_id = e.id left join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
+
+
+-- Backward compatibility (will be removed soon)
+
+-- Original publication types
+
+drop table if exists aux_origintypes;
+
+create table aux_origintypes (
+  id char(1) not null primary key,
+  text varchar(50) not null unique
+);
+
+insert into aux_origintypes(id, text) (select id, text from origintypes);
+
+drop table if exists aux_issues;
+
+create table aux_issues (
+  issue_id int(11) not null primary key,
+  name varchar(300) not null
+);
+
+insert into aux_issues(issue_id, name) (select issue_id, name from search_by_issues);
 
 -- END
