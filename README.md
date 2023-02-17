@@ -346,6 +346,8 @@ The following websites are fully integrated with ZXDB:
 
 * [ZX-Spectrum Reviews (ZXSR)](http://www.zxspectrumreviews.co.uk/) - Each ZXDB title or magazine review links to the corresponding webpage at **Chris Bourne**'s site, and vice-versa.
 
+* [Lemon64](https://www.lemon64.com/) - Each ZXDB title (that's also available for Commodore 64) links to the corresponding webpage at **Kim Lemon**'s site, and vice-versa.
+
 * [Spectrum 2.0](http://spectrum20.zxdemo.org/) - Each ZXDB title links to the corresponding webpage at **Philip Kendall**'s site.
 
 * [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZX81 title in ZXDB links to the corresponding webpage at **Simon Holdsworth**'s site.
@@ -354,7 +356,7 @@ The following websites are fully integrated with ZXDB:
 
 * [JSW Central](https://jswcentral.org/) - Each Jet Set Willy mod in ZXDB links to the corresponding webpage at **Daniel Gromann**'s site.
 
-* [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia
+* [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia.
 
 * [MobyGames](http://www.mobygames.com/) - Each ZXDB title links to the corresponding webpage at MobyGames.
 

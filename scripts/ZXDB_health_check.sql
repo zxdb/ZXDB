@@ -90,7 +90,9 @@ select * from (
     union all
         select e.id,e.title,t.text,'container that is not compilation, covertape or e-magazine' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select container_id from contents) and e.id not in (select container_id from contents where container_id = entry_id) and (e.genretype_id is null or e.genretype_id < 80)
     union all
-        select e.id,e.title,t.text,'** program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where e.title like '% issue %' and e.issue_id is null
+        select e.id,e.title,r.release_year,'re-release of never released title' from entries e inner join releases r on e.id = r.entry_id where e.availabletype_id in ('N','R') and r.release_seq > 0 and e.id not in (10180)  -- exception to this rule: when a title was planned to be published in different countries by different publishers
+    union all
+        select e.id,e.title,t.text,'** program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where (e.genretype_id in (81,82) or e.title like '% issue %') and e.issue_id is null and (e.availabletype_id is null or e.availabletype_id <> '*')
     union all
         select e.id,e.title,text,'** programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
     union all
@@ -124,7 +126,9 @@ select * from (
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
-        select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11) and d.is_demo = 0
+        select e.id,e.title,null,'missing playable file from recovered title' from entries e where e.availabletype_id = 'R' and e.id not in (select entry_id from downloads where filetype_id in (8,10,11,17) and is_demo=0)
+    union all
+        select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11,17) and d.is_demo = 0
     union all
          select null,null,concat('/zxdb/sinclair/entries/.../',filename),'** duplicated filename (to be avoided if possible)' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
     union all

@@ -184,25 +184,7 @@ update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,
 
 
 -- Backward compatibility (will be removed soon)
-
--- Original publication types
-
 drop table if exists aux_origintypes;
-
-create table aux_origintypes (
-  id char(1) not null primary key,
-  text varchar(50) not null unique
-);
-
-insert into aux_origintypes(id, text) (select id, text from origintypes);
-
 drop table if exists aux_issues;
-
-create table aux_issues (
-  issue_id int(11) not null primary key,
-  name varchar(300) not null
-);
-
-insert into aux_issues(issue_id, name) (select issue_id, name from search_by_issues);
 
 -- END
