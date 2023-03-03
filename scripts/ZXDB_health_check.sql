@@ -56,6 +56,8 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'invalid archive.org link in downloads' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%/archive.org/%' and d.file_link not like 'https://archive.org/download/%'
     union all
+        select e.id,e.title,d.file_link,'invalid remote link' from downloads d inner join entries e on d.entry_id = e.id where d.filetype_id = 0 and d.file_link not like 'http%'
+    union all
         select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
     union all
         select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id between 1 and 3 and d.scr_border<>7
