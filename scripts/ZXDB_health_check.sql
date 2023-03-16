@@ -28,9 +28,11 @@ select * from (
     union all
         select e.id,e.title,g.text,'game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
-        select null,null,b1.name,'** possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null
+        select null,null,b1.name,'possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null and b1.id <> 14006
     union all
         select e1.id,e1.title,null,'** possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
+    union all
+        select e.id,e.title,null,'** covertape shouldn''t have separate price' from entries e inner join releases r on e.id = r.entry_id where e.genretype_id = 81 and r.currency_id is not null
     union all
         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
@@ -76,6 +78,8 @@ select * from (
     union all
         select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.label_id,-1)<>coalesce(i2.label_id,-1) or coalesce(i1.label2_id,-1)<>coalesce(i2.label2_id,-1) or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent_id is not null
     union all
+        select null,null,i.id,'magazine supplements cannot have their own supplements' from issues p inner join issues i on i.parent_id = p.id where p.parent_id is not null
+    union all
         select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'** unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
     union all
         select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page), 'mismatch between review and award' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id inner join zxsr_awards a on r.award_id = a.id left join entries e on e.id = r.entry_id where i.magazine_id <> a.magazine_id
@@ -99,6 +103,8 @@ select * from (
         select e.id,e.title,text,'** programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
     union all
         select e.id,e.title,text,'** aliases must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'aka. %' or text like 'a.k.a. %'
+    union all
+        select e.id,e.title,f.text,'duplicated ports' from entries e inner join ports p1 on e.id = p1.entry_id inner join platforms f on p1.platform_id = f.id inner join ports p2 on p1.entry_id = p2.entry_id and p1.platform_id = p2.platform_id and coalesce(p1.title,'') = coalesce(p2.title,'') and p1.is_official = p2.is_official and p1.id < p2.id where p1.link_system is null or p2.link_system is null or p1.link_system = p2.link_system
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from contents where entry_id is not null) or id in (select container_id from contents) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs) or id in (select entry_id from downloads))
     union all
@@ -153,6 +159,10 @@ select * from (
         select e.id,e.title,c.container_id,'redundant alias in contents' from entries e inner join contents c on e.id = c.entry_id where e.title = c.alias
     union all
         select e.id,e.title,t.text,'possibly misclassified game editor' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 52 and e.id in (select entry_id from relations where relationtype_id = 'e')
+    union all
+        select e.id,e.title,concat(m.text,' / ',n.text),'expected ZX-Spectrum 128 emulating ZX81' from entries e inner join relations r on e.id = r.entry_id and r.relationtype_id = 'z' inner join entries k on r.original_id = k.id left join machinetypes m on e.machinetype_id = m.id left join machinetypes n on k.machinetype_id = n.id where coalesce(m.text,'') not like 'ZX-Spectrum 128%' or coalesce(n.text,'') not like 'ZX81%'
+    union all
+        select e.id,e.title,null,'non-review cannot have ZXSR content' from magrefs r inner join entries e on r.entry_id = e.id where r.referencetype_id <> 10 and (r.id in (select magref_id from zxsr_scores) or r.id in (select magref_id from zxsr_captions))
     union all
         select e.id,e.title,t.text,'game editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
     union all

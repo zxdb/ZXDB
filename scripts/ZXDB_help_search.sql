@@ -146,6 +146,36 @@ create table search_by_magazines (
 insert into search_by_magazines (magazine_id, label_id) (select magazine_id, lid from (select magazine_id, label_id as lid from issues where label_id is not null union all select magazine_id, label2_id as lid from issues where label2_id is not null) as x group by magazine_id, lid);
 
 
+-- Help search for magazine references
+
+drop table if exists search_tmp0;
+
+create table search_tmp0 (
+    eid int(11) not null,
+    mid int(11) not null,
+    index (eid),
+    index (mid)
+);
+
+insert into search_tmp0(eid, mid) (select entry_id, id from magrefs where entry_id is not null);
+insert into search_tmp0(eid, mid) (select c.entry_id, r.id from magrefs r inner join contents c on r.entry_id = c.container_id where c.entry_id is not null);
+insert into search_tmp0(eid, mid) (select c.container_id, r.id from magrefs r inner join contents c on r.entry_id = c.entry_id);
+insert into search_tmp0(eid, mid) (select e.id, r.id from magrefs r inner join entries e on r.issue_id = e.issue_id where r.referencetype_id = 21 and e.genretype_id = 81);
+
+drop table if exists search_by_magrefs;
+
+create table search_by_magrefs (
+    entry_id int(11) not null,
+    magref_id int(11) not null,
+    primary key (entry_id, magref_id),
+    index (magref_id)
+);
+
+insert into search_by_magrefs(entry_id, magref_id) (select eid, mid from search_tmp0 group by eid, mid order by eid, mid);
+
+drop table search_tmp0;
+
+
 -- Help search for original publication details
 
 drop table if exists search_by_origins;
@@ -181,10 +211,5 @@ insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, d
 
 -- Original publication
 update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(e.title is not null,concat('"',e.title,'"'),if(i.id is not null,s.name,'?'))) as publication from search_by_origins x inner join origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join search_by_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries e on x.container_id = e.id left join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
-
-
--- Backward compatibility (will be removed soon)
-drop table if exists aux_origintypes;
-drop table if exists aux_issues;
 
 -- END
