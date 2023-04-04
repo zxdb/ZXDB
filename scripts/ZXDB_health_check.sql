@@ -98,7 +98,7 @@ select * from (
     union all
         select e.id,e.title,r.release_year,'re-release of never released title' from entries e inner join releases r on e.id = r.entry_id where e.availabletype_id in ('N','R') and r.release_seq > 0 and e.id not in (10180)  -- exception to this rule: when a title was planned to be published in different countries by different publishers
     union all
-        select e.id,e.title,t.text,'** program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where (e.genretype_id in (81,82) or e.title like '% issue %') and e.issue_id is null and (e.availabletype_id is null or e.availabletype_id <> '*')
+        select e.id,e.title,t.text,'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where (e.genretype_id in (81,82) or e.title like '% issue %') and e.issue_id is null and (e.availabletype_id is null or e.availabletype_id <> '*')
     union all
         select e.id,e.title,text,'** programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
     union all
@@ -194,6 +194,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,n.text,'** note to be converted into compilation or relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Came%'
     union all
         select e.id,e.title,n.text,'** note to be converted into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
+    union all
+        select e.id,e.title,k.title,'reciprocal relationship' from entries e inner join relations r1 on r1.entry_id = e.id inner join relations r2 on r1.entry_id = r2.original_id and r1.original_id = r2.entry_id inner join entries k on r1.original_id = k.id
     union all
         select e.id,e.title,n.text,'** note to be converted into relation or license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion of%'
     union all
