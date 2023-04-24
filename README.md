@@ -2,7 +2,7 @@
 
 ZXDB is an open database containing historical information of software, hardware, magazines and books about ZX-Spectrum and related machines.
 
-It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), **Daren Pearcy**'s [RZX Archive](http://www.rzxarchive.co.uk/), and **Chris Bourne**'s [ZXSR](http://www.zxspectrumreviews.co.uk/) repositories (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
+It was created by **Einar Saukas**, starting from the full content of **Martijn van der Heide**'s [Original WorldOfSpectrum](https://web.archive.org/web/20151117205811/http://www.worldofspectrum.org/), **Jim Grimwood**'s [SPOT/SPEX](http://www.users.globalnet.co.uk/~jg27paw4/spot-on/), **Daren Pearcy**'s [RZX Archive](http://www.rzxarchive.co.uk/), and **Chris Bourne**'s [ZXSR](http://www.zxspectrumreviews.co.uk/) repositories (all of them imported with consent, directly from their internal files). Afterwards it was expanded with literally tens of thousands of corrections, additions, and integration from many other sources. It's currently the most widely used Sinclair related database, feeding several Spectrum websites, an [open API](https://api.zxinfo.dk/v3/) at [ZXInfo](https://zxinfo.dk/), and the mobile application [Zx App](https://play.google.com/store/apps/details?id=com.bricboys.zxapp) that uses this API. It's also used as index reference by a dozen different websites and services.
 
 For further details, visit the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) at [Spectrum Computing](https://spectrumcomputing.co.uk/).
 
@@ -287,7 +287,7 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Pavel Pliva**: for directly working on ZXDB, patiently cataloguing typed instructions and hires inlays, and implementing our internal file upload tool;
 
-* **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/);
+* **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/v3/);
 
 * **Elia Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
 
@@ -324,7 +324,7 @@ The following websites directly use ZXDB internally:
 
 * [ZXInfo](https://zxinfo.dk/) - ZX-Spectrum archive based on ZXDB, built with ElasticSearch by **Thomas Kolbeck**.
 
-* [ZXInfo API](https://api.zxinfo.dk/) - Open ZXDB API, provided by **Thomas Kolbeck**.
+* [ZXInfo API](https://api.zxinfo.dk/v3/) - Open ZXDB API, provided by **Thomas Kolbeck**.
 
 * [ZX-Spectrum Reviews (ZXSR)](http://zxspectrumreviews.co.uk/) - ZX-Spectrum Reviews archive by **Chris Bourne**, it now runs ZXSR database integrated with ZXDB.
 
