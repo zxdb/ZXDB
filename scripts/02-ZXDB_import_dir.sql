@@ -18,6 +18,9 @@ select * from downloads where file_link like '/zxdb/%' and file_link not in (sel
 select * from files where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 select * from scraps where file_link like '/zxdb/%' and file_link not in (select file_link from tmp_dir) order by file_link;
 
+update downloads set file_md5 = null where file_md5 is not null;
+update files set file_md5 = null where file_md5 is not null;
+
 update downloads d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size, d.file_md5 = t.file_md5 where d.file_link like '/zxdb/%';
 update files d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size, d.file_md5 = t.file_md5 where d.file_link like '/zxdb/%';
 update scraps d inner join tmp_dir t on d.file_link = t.file_link set d.file_size = t.file_size where d.file_link like '/zxdb/%';

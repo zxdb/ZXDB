@@ -12,6 +12,17 @@ delete from ssd.ssd_reviews_scores where review_id in (13572,13574,13590,13591,1
 delete from ssd.ssd_reviews where review_id in (13572,13574,13590,13591,13592,13594,13595,13596,13597,13599,13931,13932,13933,14124,14125,20428,21371); -- DUPLICATED
 delete from ssd.ssd_reviews_scores where score_id = 69347;
 
+-- Delete previous ZXSR imports
+delete from zxsr_captions where 1=1;
+-- delete from zxsr_scores;
+delete from zxsr_scores where magref_id not in (select r.id from magrefs r inner join issues i on r.issue_id = i.id where i.magazine_id in (150,322));
+delete from magreffeats where magref_id >= 300000 or feature_id between 108 and 199;
+delete from magrefs where id >= 300000;
+alter table magrefs AUTO_INCREMENT = 300000;
+update magrefs set review_id = null where 1=1;
+-- update magrefs set award_id = null;
+delete from zxsr_reviews where 1=1;
+
 -- Map SSD_Magazines(mag_id) from/to ZXDB.magazines(id)
 create table tmp_magazines(
   ssd_mag_id INT(11) NOT NULL primary key,
@@ -220,6 +231,9 @@ order by r.id, c.header_order);
 update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq > s1.score_seq set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or s1.category = 'ACE Rating' or s1.category = 'Verdict' or (s1.category like 'Overall%' and s1.category not like 'Overall (%') and s1.score not like '%K)');
 
 -- Store review picture descriptions in ZXDB
+alter table zxsr_captions drop primary key;
+alter table zxsr_captions add column id int(11) not null;
+
 insert into zxsr_captions(id, magref_id, caption_seq, text, is_banner) (select s.id,t.magref_id, 0, replace(s.TheText,'\r',''), s.IsBanner from ssd.ssd_reviews_picturetext s inner join tmp_reviews t on s.ReviewId = t.id order by t.magref_id, s.IsBanner);
 
 update zxsr_reviews set review_text = SUBSTR(review_text,2) where review_text like '\n%';
@@ -288,7 +302,7 @@ update zxsr_captions set caption_seq=(select max(caption_seq)+1 from zxsr_captio
 update zxsr_captions set caption_seq=(select max(caption_seq)+1 from zxsr_captions) where id in (select min(id) from zxsr_captions where caption_seq=0 group by magref_id);
 update zxsr_captions set caption_seq=(select max(caption_seq)+1 from zxsr_captions) where id in (select min(id) from zxsr_captions where caption_seq=0 group by magref_id);
 
-alter table zxsr_captions add primary key(magref_id,caption_seq,is_banner);
+alter table zxsr_captions add primary key(magref_id,caption_seq);
 alter table zxsr_captions drop column id;
 
 drop table tmp_reviews;
