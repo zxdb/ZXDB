@@ -182,6 +182,7 @@ drop table if exists search_by_origins;
 
 create table search_by_origins (
   entry_id int(11) not null primary key,
+  library_title varchar(300) collate utf8_unicode_ci not null,
   origintype_id char(1) not null,
   container_id int(11),
   issue_id int(11),
@@ -195,21 +196,27 @@ create table search_by_origins (
 );
 
 -- Covertapes
-insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select e.id, 'C', null, e.issue_id, i.date_year, i.date_month, i.date_day from entries e inner join issues i on e.issue_id = i.id where e.genretype_id = 81 and e.id not in (select entry_id from search_by_origins));
+insert into search_by_origins(entry_id, library_title, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select e.id, e.title, 'C', null, e.issue_id, i.date_year, i.date_month, i.date_day from entries e inner join issues i on e.issue_id = i.id where e.genretype_id = 81 and e.id not in (select entry_id from search_by_origins));
 
 -- Book type-ins
-insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select b.entry_id, 'B', b.book_id, null, r.release_year, r.release_month, r.release_day from booktypeins b inner join entries e on b.book_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 where b.is_original = 1 and b.entry_id not in (select entry_id from search_by_origins));
+insert into search_by_origins(entry_id, library_title, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select b.entry_id, e.title, 'B', b.book_id, null, r.release_year, r.release_month, r.release_day from booktypeins b inner join entries e on b.entry_id = e.id inner join entries k on b.book_id = k.id inner join releases r on r.entry_id = k.id and r.release_seq = 0 where b.is_original = 1 and b.entry_id not in (select entry_id from search_by_origins));
 
 -- Magazine type-ins
-insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select x.entry_id, 'M', null, x.issue_id, i.date_year, i.date_month, i.date_day from (select entry_id, min(r.issue_id) as issue_id from magrefs r where r.is_original = 1 group by r.entry_id) as x inner join issues i on x.issue_id = i.id where x.entry_id not in (select entry_id from search_by_origins));
+insert into search_by_origins(entry_id, library_title, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select x.entry_id, x.title, 'M', null, x.issue_id, i.date_year, i.date_month, i.date_day from (select r.entry_id, e.title, min(r.issue_id) as issue_id from magrefs r inner join entries e on e.id = r.entry_id where r.is_original = 1 group by e.id) as x inner join issues i on x.issue_id = i.id where x.entry_id not in (select entry_id from search_by_origins));
 
 -- Within covertape
-insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, 'T', c.container_id, i.id, i.date_year, i.date_month, i.date_day from contents c inner join entries e on c.container_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on e.issue_id = i.id where c.is_original = 1 and e.genretype_id = 81 and c.entry_id not in (select entry_id from search_by_origins) group by c.entry_id);
+insert into search_by_origins(entry_id, library_title, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, e.title, 'T', c.container_id, i.id, i.date_year, i.date_month, i.date_day from contents c inner join entries e on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join issues i on k.issue_id = i.id where c.is_original = 1 and k.genretype_id = 81 and c.entry_id not in (select entry_id from search_by_origins) group by c.entry_id);
 
 -- Within all
-insert into search_by_origins(entry_id, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, (case when e.genretype_id in (80,111,112,113,114) then 'A' when e.genretype_id = 81 then 'T' when e.genretype_id = 82 then 'E' else 'P' end), c.container_id, null, r.release_year, r.release_month, r.release_day from contents c inner join entries e on c.container_id = e.id inner join releases r on r.entry_id = e.id and r.release_seq = 0 where c.is_original = 1 and c.entry_id not in (select entry_id from search_by_origins) group by c.entry_id);
+insert into search_by_origins(entry_id, library_title, origintype_id, container_id, issue_id, date_year, date_month, date_day) (select c.entry_id, e.title, (case when k.genretype_id in (80,111,112,113,114) then 'A' when k.genretype_id = 81 then 'T' when k.genretype_id = 82 then 'E' else 'P' end), c.container_id, null, r.release_year, r.release_month, r.release_day from contents c inner join entries e on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join releases r on r.entry_id = k.id and r.release_seq = 0 where c.is_original = 1 and c.entry_id not in (select entry_id from search_by_origins) group by c.entry_id);
 
 -- Original publication
-update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(e.title is not null,concat('"',e.title,'"'),if(i.id is not null,s.name,'?'))) as publication from search_by_origins x inner join origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join search_by_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries e on x.container_id = e.id left join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
+update search_by_origins a inner join (select x.entry_id,concat(coalesce(m.name,group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', '),'?'),' - ',t.text,' ', if(k.title is not null,concat('"',k.title,'"'),if(i.id is not null,s.name,'?'))) as publication from search_by_origins x inner join origintypes t on x.origintype_id = t.id left join issues i on x.issue_id = i.id left join search_by_issues s on s.issue_id = i.id left join magazines m on i.magazine_id = m.id left join entries k on x.container_id = k.id left join releases r on r.entry_id = k.id and r.release_seq = 0 left join publishers p on p.entry_id = k.id and p.release_seq = 0 left join labels b on b.id = p.label_id group by x.entry_id) as y on a.entry_id = y.entry_id set a.publication = y.publication;
+
+-- Standalone releases
+insert into search_by_origins(entry_id, library_title, origintype_id, date_year, date_month, date_day, publication) (select e.id, e.title, 'S', r.release_year, r.release_month, r.release_day, group_concat(b.name ORDER BY p.publisher_seq SEPARATOR ', ') from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 left join publishers p on p.entry_id = e.id and p.release_seq = 0 left join labels b on b.id = p.label_id where e.id not in (select entry_id from search_by_origins) group by e.id);
+
+-- Library title
+update search_by_origins s inner join prefixes p on s.library_title like concat(p.text,'%') left join prefixexempts x on s.library_title like concat(x.text,'%') set s.library_title = trim(concat(substr(s.library_title,length(p.text)+1),', ',left(s.library_title, length(p.text)))) where x.text is null;
 
 -- END
