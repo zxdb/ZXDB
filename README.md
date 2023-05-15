@@ -346,7 +346,7 @@ The following websites are fully integrated with ZXDB:
 
 * [ZX-Spectrum Reviews (ZXSR)](http://www.zxspectrumreviews.co.uk/) - Each ZXDB title or magazine review links to the corresponding webpage at **Chris Bourne**'s site, and vice-versa.
 
-* [Lemon64](https://www.lemon64.com/) - Each ZXDB title (that's also available for Commodore 64) links to the corresponding webpage at **Kim Lemon**'s site, and vice-versa.
+* [Lemon64](https://www.lemon64.com/) - Each ZXDB title links to the corresponding Commodore 64 version at **Kim Lemon**'s site (whenever it exists), and vice-versa.
 
 * [Spectrum 2.0](http://spectrum20.zxdemo.org/) - Each ZXDB title links to the corresponding webpage at **Philip Kendall**'s site.
 
