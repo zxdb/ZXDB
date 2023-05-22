@@ -3,6 +3,7 @@
 
 USE zxdb;
 
+-- High priority warnings
 select * from (
         select a.entry_id,e.title,a.author_seq-1 as details,'skipped author sequence in authors' as warning from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
@@ -30,13 +31,7 @@ select * from (
     union all
         select null,null,b1.name,'possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b2.id is null and b1.id <> 14006
     union all
-        select e1.id,e1.title,null,'** possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
-    union all
-        select e.id,e.title,null,'** covertape shouldn''t have separate price' from entries e inner join releases r on e.id = r.entry_id where e.genretype_id = 81 and r.currency_id is not null
-    union all
         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
-    union all
-        select e.id,e.title,concat(b.name,' / ',t.name),'** team member must be a person' from entries e inner join authors a on e.id = a.entry_id inner join labels b on a.label_id = b.id inner join labels t on a.team_id = t.id where b.labeltype_id not in ('+','-')
     union all
         select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
     union all
@@ -66,9 +61,9 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id = 1 and e.id not in (31929)
     union all
-        select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-load-[0-9]\.'
+        select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-load-[0-9]\.' and e.id not in (39503)
     union all
-        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-run-[0-9]\.'
+        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-run-[0-9]\.' and e.id not in (39503)
     union all
         select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-open-[0-9]\.'
     union all
@@ -79,8 +74,6 @@ select * from (
         select null,null,concat(m.name,' #',coalesce(lpad(i1.number,3,'0'),'?'),' supplement'),'mismatch between magazine issue and supplement' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.parent_id = i2.id where i1.magazine_id<>i2.magazine_id or coalesce(i1.label_id,-1)<>coalesce(i2.label_id,-1) or coalesce(i1.label2_id,-1)<>coalesce(i2.label2_id,-1) or coalesce(i1.date_year,'')<>coalesce(i2.date_year,'') or coalesce(i1.date_month,'')<>coalesce(i2.date_month,'') or coalesce(i1.date_day,'')<>coalesce(i2.date_day,'') or coalesce(i1.volume,'')<>coalesce(i2.volume,'') or coalesce(i1.number,'')<>coalesce(i2.number,'') or coalesce(i1.special,'')<>coalesce(i2.special,'') or i2.parent_id is not null
     union all
         select null,null,i.id,'magazine supplements cannot have their own supplements' from issues p inner join issues i on i.parent_id = p.id where p.parent_id is not null
-    union all
-        select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'** unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
     union all
         select e.id,e.title,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page), 'mismatch between review and award' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id inner join zxsr_awards a on r.award_id = a.id left join entries e on e.id = r.entry_id where i.magazine_id <> a.magazine_id
     union all
@@ -104,29 +97,17 @@ select * from (
     union all
         select e.id,e.title,t.text,'program must be associated with magazine issue' from entries e left join genretypes t on t.id = e.genretype_id where (e.genretype_id in (81,82) or e.title like '% issue %') and e.issue_id is null and (e.availabletype_id is null or e.availabletype_id <> '*')
     union all
-        select e.id,e.title,text,'** programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
-    union all
-        select e.id,e.title,text,'** aliases must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'aka. %' or text like 'a.k.a. %'
-    union all
         select e.id,e.title,f.text,'duplicated ports' from entries e inner join ports p1 on e.id = p1.entry_id inner join platforms f on p1.platform_id = f.id inner join ports p2 on p1.entry_id = p2.entry_id and p1.platform_id = p2.platform_id and coalesce(p1.title,'') = coalesce(p2.title,'') and p1.is_official = p2.is_official and p1.id < p2.id where p1.link_system is null or p2.link_system is null or p1.link_system = p2.link_system
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from contents where entry_id is not null) or id in (select container_id from contents) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs) or id in (select entry_id from downloads))
     union all
-        select e.id,e.title,d.file_link,'** probably demo version not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
-    union all
-        select e.id,e.title,d.file_link,'** possibly file with incorrect release_seq' from downloads d inner join entries e on d.entry_id = e.id where e.id between 2000000 and 3000000 and d.file_link like '%)%' and d.release_seq=0 and e.id not in (2000113)
-    union all
         select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated tags with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
-    union all
-        select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'** incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
     union all
         select id,title,library_title,'library title should not start with article "The"' from entries where library_title like 'The %'
     union all
         select e.id,e.title,g.name,'CSSCGC title missing from compilation' from entries e inner join members m on m.entry_id = e.id inner join tags g on g.id = m.tag_id and g.name like 'CSSCGC Crap Games Contest%' left join entries k on k.title like 'CSSCGC Crap Games Competition%' and e.id <> k.id left join contents c on c.container_id = k.id and c.entry_id = e.id where k.title = concat('CSSCGC Crap Games Competition',right(g.name,5)) and c.entry_id is null
     union all
         select e.id,e.title,k.title,'CSSCGC title missing from contest' from entries e inner join contents c on c.entry_id = e.id inner join entries k on k.id = c.container_id and k.title like 'CSSCGC Crap Games Competition%' left join tags g on g.name like 'CSSCGC Crap Games Contest%' and g.name = concat('CSSCGC Crap Games Contest',right(k.title,5)) left join members m on g.id = m.tag_id and m.entry_id = e.id where m.entry_id is null
-    union all
-        select e.id,e.title,x.file_link,'** archived non-historical file' from scraps x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
     union all
         select null,null,d.file_link,'archived file in use' from scraps x inner join downloads d where x.file_link = d.file_link
     union all
@@ -142,8 +123,6 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11,17) and d.is_demo = 0
     union all
-         select null,null,concat('/zxdb/sinclair/entries/.../',filename),'** duplicated filename (to be avoided if possible)' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
-    union all
          select id,title,null,'deprecated title without related original title' from entries where id not in (select entry_id from relations where relationtype_id = '*') and availabletype_id = '*'
     union all
          select id,title,null,'deprecated title cannot be an original' from entries where id in (select original_id from relations) and availabletype_id = '*'
@@ -152,11 +131,7 @@ select * from (
     union all
         select null,null,concat(name,' (',id,')'),'missing list of magazine issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
     union all
-        select e.id,e.title,n.text,'** note probably conversible to license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Based%'
-    union all
         select e.id,e.title,t.text,'title cannot have multiple origins' from entries e inner join relations r1 on r1.entry_id = e.id inner join relationtypes t on t.id = r1.relationtype_id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = r1.relationtype_id and r2.original_id > r1.original_id where t.id in ('p','u')
-    union all
-        select e.id,e.title,t.text,'** missing list of contents' as todo from entries e inner join genretypes t on e.genretype_id = t.id where (e.genretype_id in (80,81) or e.genretype_id >= 110) and e.id not in (select container_id from contents)
     union all
         select e.id,e.title,d.file_link,'itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
     union all
@@ -173,8 +148,6 @@ select * from (
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
 r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36,37) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
     union all
-        select e.id,e.title,concat(t.text,': ',m.name,' (issue-id ',i.id,')'),'** invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id inner join magrefs r on r.issue_id = i.id inner join referencetypes t on r.referencetype_id = t.id left join entries e on e.id = r.entry_id where r.page < i.cover_page
-    union all
         select e.id,e.title,concat(coalesce(r.release_year,'-'),'/',coalesce(r.release_month,'-'),'/',coalesce(r.release_day,'-'),' vs ',coalesce(i.date_year,'-'),'/',coalesce(i.date_month,'-'),'/',coalesce(i.date_day,'-')),'conflicting original publication date between tape and magazine' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on i.id = e.issue_id where e.genretype_id <> 81 and e.id not in (select entry_id from contents where is_original=1) and e.id not in (select entry_id from booktypeins where is_original=1) and e.id not in (select entry_id from magrefs where is_original=1) and (coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1))
     union all
         select x.id,x.title,concat(nc+nr+nb,' original publications'),'multiple original publications' from (select e.id, e.title, count(distinct c.is_original) as nc, count(distinct i.magazine_id) as nr, count(distinct b.book_id) as nb from entries e left join contents c on c.entry_id = e.id and c.is_original = 1 left join magrefs r on r.entry_id = e.id and r.is_original = 1 left join issues i on r.issue_id = i.id left join booktypeins b on b.entry_id = e.id and b.is_original = 1 group by e.id) as x where nc+nr+nb > 1
@@ -185,31 +158,62 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select e.id,e.title,k.title,'conflicting original publication date in CSSCGC entry' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.container_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join contents t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.container_id < t.container_id where t2.container_id is null and k.id in (select entry_id from members where tag_id=3581) and r.release_year is not null and r.release_year <> s.release_year and r.release_year <> s.release_year+1
     union all
-        select e.id,e.title,k.title,'** conflicting original publication date in program within compilation, covertape or e-magazine' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.container_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join contents t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.container_id < t.container_id where t2.container_id is null and k.id not in (select entry_id from members where tag_id=3581) and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(s.release_year,-1) or coalesce(r.release_month,-1) <> coalesce(s.release_month,-1) or coalesce(r.release_day,-1) <> coalesce(s.release_day,-1))
-    union all
-        select e.id,e.title,k.title,'** conflicting original publication date in book type-in' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join booktypeins t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.book_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join booktypeins t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.book_id < t.book_id where t2.book_id is null and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(s.release_year,-1) or coalesce(r.release_month,-1) <> coalesce(s.release_month,-1) or coalesce(r.release_day,-1) <> coalesce(s.release_day,-1))
-    union all
-        select e.id,e.title,m.name,'** conflicting original publication date in magazine type-in' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join magrefs t on t.entry_id = e.id and t.is_original = 1 inner join issues i on i.id = t.issue_id inner join magazines m on m.id = i.magazine_id left join magrefs t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.issue_id < i.id where t2.id is null and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1))
-    union all
-        select e.id,e.title,null,'** conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
-    union all
-        select e.id,e.title,null,'** conflicting original price' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where r.currency_id is not null and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
-    union all
-        select e.id,e.title,n.text,'** note to be converted into compilation or relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Came%'
-    union all
-        select e.id,e.title,n.text,'** note to be converted into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
-    union all
         select e.id,e.title,k.title,'reciprocal relationship' from entries e inner join relations r1 on r1.entry_id = e.id inner join relations r2 on r1.entry_id = r2.original_id and r1.original_id = r2.entry_id inner join entries k on r1.original_id = k.id
-    union all
-        select e.id,e.title,n.text,'** note to be converted into relation or license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion of%'
-    union all
-        select null,null,file_link,'** file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
-    union all
-        select null,null,m.name,'** label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
     union all
         select null,null,concat(b.name,' [',c.text,'] x ',b2.name,' [',c2.text,']'),'mismatching countries' from labels b inner join countries c on b.country_id = c.id inner join labels b2 on b.owner_id = b2.id inner join countries c2 on b2.country_id = c2.id where b.labeltype_id='-' and c.id <> c2.id
 ) as warnings
-where warning not like '**%' -- remove this line to see all potential problems!
+order by entry_id, details;
+
+-- Low priority warnings
+select * from (
+        select a.entry_id,e.title,concat(b.name,' / ',t.name) as details,'team member must be a person' as warning from entries e inner join authors a on e.id = a.entry_id inner join labels b on a.label_id = b.id inner join labels t on a.team_id = t.id where b.labeltype_id not in ('+','-')
+    union all
+        select e1.id,e1.title,null,'possibly unnecessary index in unique entry title' from entries e1 left join entries e2 on e1.id <> e2.id and e2.title like concat(trim(substring_index(e1.title, '[', 1)),'%') where e1.title like '% [%]' and e2.id is null
+    union all
+        select e.id,e.title,null,'covertape shouldn''t have separate price' from entries e inner join releases r on e.id = r.entry_id where e.genretype_id = 81 and r.currency_id is not null
+    union all
+        select null,null,concat(m.name,' #',coalesce(lpad(i.number,3,'0'),'?'),' ',coalesce(i.date_year,'?'),'/',coalesce(i.date_month,'?'),' page ',r.page),'unidentified interview' from magrefs r inner join issues i on r.issue_id = i.id inner join magazines m on i.magazine_id = m.id where r.entry_id is null and r.label_id is null and r.topic_id is null
+    union all
+        select e.id,e.title,text,'programs in compilation must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like '[%+%]'
+    union all
+        select e.id,e.title,text,'aliases must be indexed properly' from notes n left join entries e on e.id = n.entry_id where text like 'aka. %' or text like 'a.k.a. %'
+    union all
+        select e.id,e.title,d.file_link,'probably demo version not marked as demo' from downloads d inner join entries e on d.entry_id = e.id left join genretypes t on t.id = e.genretype_id where lower(d.file_link) like '%(demo%' and t.text not like '%Demo%' and d.is_demo=0 and d.filetype_id between 8 and 11
+    union all
+        select e.id,e.title,d.file_link,'possibly file with incorrect release_seq' from downloads d inner join entries e on d.entry_id = e.id where e.id between 2000000 and 3000000 and d.file_link like '%)%' and d.release_seq=0 and e.id not in (2000113)
+    union all
+        select e.id,e.title,concat('#',r1.release_seq,' (',r1.release_year,') and #',r2.release_seq,' (',r2.release_year,')'),'incorrect release order' from releases r1 inner join releases r2 on r1.entry_id = r2.entry_id and r1.release_seq < r2.release_seq and r1.release_year > r2.release_year inner join entries e on e.id = r1.entry_id
+    union all
+        select e.id,e.title,x.file_link,'archived non-historical file' from scraps x left join entries e on e.id = x.entry_id where x.file_link like '/zxdb/%'
+    union all
+         select null,null,concat('/zxdb/sinclair/entries/.../',filename),'duplicated filename (to be avoided if possible)' from (select substring_index(file_link,'/',-1) as filename, count(id) as n from downloads where file_link like '/zxdb/sinclair/entries/%.tap.zip' or file_link like '/zxdb/sinclair/entries/%.tzx.zip' group by filename) as x where n>1
+    union all
+        select e.id,e.title,n.text,'note probably conversible to license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Based%'
+    union all
+        select e.id,e.title,t.text,'missing list of contents' as todo from entries e inner join genretypes t on e.genretype_id = t.id where (e.genretype_id in (80,81) or e.genretype_id >= 110) and e.id not in (select container_id from contents)
+    union all
+        select e.id,e.title,concat(t.text,': ',m.name,' (issue-id ',i.id,')'),'invalid page number reference' from issues i inner join magazines m on i.magazine_id = m.id inner join magrefs r on r.issue_id = i.id inner join referencetypes t on r.referencetype_id = t.id left join entries e on e.id = r.entry_id where r.page < i.cover_page
+    union all
+        select e.id,e.title,k.title,'conflicting original publication date in program within compilation, covertape or e-magazine' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.container_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join contents t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.container_id < t.container_id where t2.container_id is null and k.id not in (select entry_id from members where tag_id=3581) and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(s.release_year,-1) or coalesce(r.release_month,-1) <> coalesce(s.release_month,-1) or coalesce(r.release_day,-1) <> coalesce(s.release_day,-1))
+    union all
+        select e.id,e.title,k.title,'conflicting original publication date in book type-in' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join booktypeins t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.book_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join booktypeins t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.book_id < t.book_id where t2.book_id is null and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(s.release_year,-1) or coalesce(r.release_month,-1) <> coalesce(s.release_month,-1) or coalesce(r.release_day,-1) <> coalesce(s.release_day,-1))
+    union all
+        select e.id,e.title,m.name,'conflicting original publication date in magazine type-in' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join magrefs t on t.entry_id = e.id and t.is_original = 1 inner join issues i on i.id = t.issue_id inner join magazines m on m.id = i.magazine_id left join magrefs t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.issue_id < i.id where t2.id is null and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1))
+    union all
+        select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
+    union all
+        select e.id,e.title,null,'conflicting original price' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where r.currency_id is not null and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
+    union all
+        select e.id,e.title,n.text,'note to be converted into compilation or relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Came%'
+    union all
+        select e.id,e.title,n.text,'note to be converted into relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Almost%'
+    union all
+        select e.id,e.title,n.text,'note to be converted into relation or license' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion of%'
+    union all
+        select null,null,file_link,'file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
+    union all
+        select null,null,m.name,'label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
+) as warnings
 order by entry_id, details;
 
 -- END
