@@ -295,9 +295,9 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Steven Brown**: for recovering and preserving a huge amount of rare programs at [TZXVault](https://tzxvault.org/), and helping to add them to ZXDB;
 
-* **Hikoki**: for cataloguing all titles released in recent years, and helping to add this information to ZXDB (and also providing inumerous other contributions to ZXDB content);
+* **Andre Luna Leao**: for collecting all kinds of programs at [Planeta Sinclair](https://planetasinclair.blogspot.com/), and helping to add them to ZXDB;
 
-* Everybody else that have assisted and supported this project since the beginning!
+* **Hikoki**, **Neil Parsons** and everybody else that have contributed, assisted and supported this project since the beginning!
 
 Also special thanks to everyone that contributed to the creation of ZXDB, particularly:
 
@@ -348,6 +348,10 @@ The following websites are fully integrated with ZXDB:
 
 * [Lemon64](https://www.lemon64.com/) - Each ZXDB title links to the corresponding Commodore 64 version at **Kim Lemon**'s site (whenever it exists), and vice-versa.
 
+* [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at CASA, and vice-versa.
+
+* [Demozoo](https://demozoo.org/) - Each scene demo in ZXDB links to the corresponding webpage at **Matt Westcott**'s site.
+
 * [Spectrum 2.0](http://spectrum20.zxdemo.org/) - Each ZXDB title links to the corresponding webpage at **Philip Kendall**'s site.
 
 * [ZX81 Stuff](http://www.zx81stuff.org.uk/) - Each ZX81 title in ZXDB links to the corresponding webpage at **Simon Holdsworth**'s site.
@@ -359,8 +363,6 @@ The following websites are fully integrated with ZXDB:
 * [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia.
 
 * [MobyGames](http://www.mobygames.com/) - Each ZXDB title links to the corresponding webpage at MobyGames.
-
-* [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at C.A.S.A.
 
 * [Lost in Translation](http://www.exotica.org.uk/) - Each ZXDB title links to the corresponding webpage at Lost in Translation.
 

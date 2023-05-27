@@ -3,9 +3,9 @@
 
 USE zxdb;
 
--- High priority warnings
+-- ERRORS
 select * from (
-        select a.entry_id,e.title,a.author_seq-1 as details,'skipped author sequence in authors' as warning from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
+        select a.entry_id,e.title,a.author_seq-1 as details,'skipped author sequence in authors' as error from authors a inner join entries e on a.entry_id = e.id where a.author_seq > 1 and a.author_seq-1 not in (select a2.author_seq from authors a2 where a2.entry_id = a.entry_id)
     union all
         select id,title,'0','no release number in releases' from entries where id not in (select entry_id from releases)
     union all
@@ -164,7 +164,7 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
 ) as warnings
 order by entry_id, details;
 
--- Low priority warnings
+-- WARNINGS
 select * from (
         select a.entry_id,e.title,concat(b.name,' / ',t.name) as details,'team member must be a person' as warning from entries e inner join authors a on e.id = a.entry_id inner join labels b on a.label_id = b.id inner join labels t on a.team_id = t.id where b.labeltype_id not in ('+','-')
     union all
