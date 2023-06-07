@@ -115,7 +115,7 @@ select * from (
     union all
         select null,null,name,'magazine cannot be both paper and electronic' from magazines where id in (select magazine_id from entries e inner join issues i on e.issue_id = i.id where e.genretype_id = 82) and (link_mask is not null or archive_mask is not null)
     union all
-        select e.id,e.title,concat(b2.name,' / ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where (b1.owner_id = b2.id or (b1.id < b2.id and b1.labeltype_id = '-' and b2.labeltype_id = '-' and b1.owner_id = b2.owner_id)) and e.id not in (4448,15020)
+        select e.id,e.title,concat(b2.name,' & ',b1.name),'same author credited twice' from entries e inner join authors a1 on a1.entry_id = e.id inner join labels b1 on a1.label_id = b1.id inner join authors a2 on a2.entry_id = e.id inner join labels b2 on a2.label_id = b2.id where (b1.owner_id = b2.id or (b1.id < b2.id and b1.labeltype_id = '-' and b2.labeltype_id = '-' and b1.owner_id = b2.owner_id)) and e.id not in (4448,15020)
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
@@ -213,6 +213,8 @@ select * from (
         select null,null,file_link,'file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select null,null,m.name,'label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
+    union all
+        select e.id,e.title,group_concat(b.name order by p.publisher_seq separator ' / '),'scene demo without Demozoo link' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 inner join labels b on p.label_id = b.id where e.genretype_id = 79 and e.id not in (select entry_id from webrefs where website_id = 48) group by e.id
 ) as warnings
 order by entry_id, details;
 
