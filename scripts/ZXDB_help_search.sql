@@ -129,7 +129,31 @@ create table search_by_issues (
   name varchar(300) not null
 );
 
-insert into search_by_issues(issue_id, name) (select id, trim(concat(if(volume is not null,concat('v.',volume),''),if(number is not null,concat(' #',number),''),if(date_year is not null,concat(' - ',date_year,if(date_month is not null,concat('/',date_format(str_to_date(date_month,'%m'),'%b'),if(date_day is not null,concat('/',date_day),'')),'')),''),if(special is not null,concat(' special "',special,'"'),''),if(supplement is not null,concat(' supplement "',supplement,'"'),''))) from issues);
+drop table if exists tmp_month;
+
+create table tmp_month (
+  id smallint(6) not null primary key,
+  text varchar(3) not null
+);
+
+-- (due to a bug with str_to_date() in certain MySQL versions, it's safer to convert manually!)
+insert into tmp_month (id, text) values
+(1, 'Jan'),
+(2, 'Feb'),
+(3, 'Mar'),
+(4, 'Apr'),
+(5, 'May'),
+(6, 'Jun'),
+(7, 'Jul'),
+(8, 'Aug'),
+(9, 'Sep'),
+(10, 'Oct'),
+(11, 'Nov'),
+(12, 'Dec');
+
+insert into search_by_issues(issue_id, name) (select i.id, trim(concat(if(i.volume is not null,concat('v.',i.volume),''),if(i.number is not null,concat(' #',i.number),''),if(i.date_year is not null,concat(' - ',i.date_year,if(i.date_month is not null,concat('/',m.text,if(i.date_day is not null,concat('/',i.date_day),'')),'')),''),if(i.special is not null,concat(' special "',i.special,'"'),''),if(i.supplement is not null,concat(' supplement "',i.supplement,'"'),''))) from issues i left join tmp_month m on i.date_month = m.id);
+
+drop table tmp_month;
 
 
 -- Help search for magazine publishers
