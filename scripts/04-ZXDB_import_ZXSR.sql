@@ -221,7 +221,7 @@ set r.review_id = t.parent_id
 where 1=1;
 
 -- Store compilation content's review scores in ZXDB
-insert into zxsr_scores(magref_id, score_seq, category, is_overall, score) (select r.id, c.header_order, c.review_header, 0, nullif(concat(coalesce(trim(c.review_score),''),coalesce(trim(c.score_suffix),'')),'')
+insert into zxsr_scores(magref_id, score_seq, category, is_overall, score) (select r.id, if(c.review_header like '%(%',c.header_order,1), c.review_header, 0, nullif(concat(coalesce(trim(c.review_score),''),coalesce(trim(c.score_suffix),'')),'')
 from ssd.ssd_reviews_scores_compilations c
 inner join tmp_reviews t on c.review_id = t.id
 inner join magrefs r on c.game_id = r.entry_id and t.issue_id = r.issue_id and t.page = r.page and r.referencetype_id = 10 and r.score_group = ''

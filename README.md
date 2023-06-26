@@ -348,6 +348,8 @@ The following websites are fully integrated with ZXDB:
 
 * [Lemon64](https://www.lemon64.com/) - Each ZXDB title links to the corresponding Commodore 64 version at **Kim Lemon**'s site (whenever it exists), and vice-versa.
 
+* [LemonAmiga](https://www.lemonamiga.com/) - Each ZXDB title links to the corresponding Amiga version at another **Kim Lemon**'s site (whenever it exists), and vice-versa.
+
 * [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at CASA, and vice-versa.
 
 * [Demozoo](https://demozoo.org/) - Each scene demo in ZXDB links to the corresponding webpage at **Matt Westcott**'s site.
@@ -367,6 +369,10 @@ The following websites are fully integrated with ZXDB:
 * [Lost in Translation](http://www.exotica.org.uk/) - Each ZXDB title links to the corresponding webpage at Lost in Translation.
 
 * [Freebase](http://zxspectrum.freebase.com/) - Each ZXDB title links to the corresponding webpage at Freebase.
+
+* [Pouet](https://www.pouet.net/) - Each scene demo in ZXDB links to the corresponding webpage at Pouet.
+
+* [ZXAAA](https://zxaaa.net/) - Each scene demo in ZXDB links to the corresponding webpage at ZXAAA.
 
 * [The Tipshop](http://www.the-tipshop.co.uk/) - Each ZXDB title links to the corresponding webpage at **Gerard Sweeney**'s site.
 
