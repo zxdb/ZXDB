@@ -15,11 +15,11 @@ select * from (
     union all
         select e.id,e.title,concat(c.media_seq,'-',c.media_side,'-',c.prog_seq-1),'skipped item in contents' from contents c inner join entries e on c.container_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from contents c2 where c2.container_id = c.container_id and c2.media_seq = c.media_seq and c2.media_side = c.media_side)
     union all
-        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is null and g.tagtype_id = 'S'
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.member_seq is null and g.tagtype_id = 'S'
     union all
-        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq > 1 and m.series_seq-1 not in (select m2.series_seq from members m2 where m2.tag_id = m.tag_id)
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where g.tagtype_id = 'S' and m.member_seq > 1 and m.member_seq-1 not in (select m2.member_seq from members m2 where m2.tag_id = m.tag_id)
     union all
-        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.series_seq is not null and g.tagtype_id <> 'S'
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.member_seq is not null and g.tagtype_id not in ('S','C')
     union all
         select p.entry_id,e.title,p.publisher_seq-1,'skipped publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all

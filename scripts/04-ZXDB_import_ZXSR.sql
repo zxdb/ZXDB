@@ -16,6 +16,7 @@ delete from ssd.ssd_reviews_scores where score_id = 69347;
 delete from zxsr_captions where 1=1;
 -- delete from zxsr_scores;
 delete from zxsr_scores where magref_id not in (select r.id from magrefs r inner join issues i on r.issue_id = i.id where i.magazine_id in (150,322));
+select * from magrefs where id >= 300000;
 delete from magreffeats where magref_id >= 300000 or feature_id between 108 and 199;
 delete from magrefs where id >= 300000;
 alter table magrefs AUTO_INCREMENT = 300000;

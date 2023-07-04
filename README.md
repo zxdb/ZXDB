@@ -352,7 +352,7 @@ The following websites are fully integrated with ZXDB:
 
 * [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at CASA, and vice-versa.
 
-* [Demozoo](https://demozoo.org/) - Each scene demo in ZXDB links to the corresponding webpage at **Matt Westcott**'s site.
+* [Demozoo](https://demozoo.org/) - Each scene demo in ZXDB links to the corresponding webpage at **Matt Westcott**'s site, and vice-versa.
 
 * [Spectrum 2.0](http://spectrum20.zxdemo.org/) - Each ZXDB title links to the corresponding webpage at **Philip Kendall**'s site.
 
