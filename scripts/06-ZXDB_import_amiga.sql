@@ -1,4 +1,4 @@
--- [ZXDB] Import into ZXDB all links from lemon amiga.
+-- [ZXDB] Import into ZXDB all links from lemonamiga.
 -- Simply download latest version of https://www.lemonamiga.com/games/export/?key=9zU47xNvqXWg to the same directory of this script, then run it!
 -- by Einar Saukas
 
@@ -57,10 +57,14 @@ and x.lemon_id is null
 order by e.title;
 
 -- List of ZXDB titles missing links to corresponding Amiga titles
-select * from entries e
+select e.id,e.title,GROUP_CONCAT(b.name ORDER BY k.publisher_seq SEPARATOR ' / ') as publishers
+from entries e
 inner join ports p on p.entry_id = e.id and p.platform_id = 19
+left join publishers k on k.entry_id = e.id and k.release_seq = 0 
+left join labels b on k.label_id = b.id
 where coalesce(e.genretype_id,0) < 80
 and p.link_system is null
+group by e.id
 order by e.title;
 
 drop table tmp_amiga;
