@@ -63,7 +63,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'loading screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 1 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-load-[0-9]\.' and e.id not in (39503)
     union all
-        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-run-[0-9]\.' and e.id not in (39503)
+        select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-run-[0-9]\.' and d.file_link not like '%-RUN-%'
     union all
         select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-open-[0-9]\.'
     union all

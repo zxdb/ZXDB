@@ -238,6 +238,8 @@ Tables prefixed with `spex_` contain information from SPOT/SPEX archive that dif
 
 Local file links starting with `/pub/sinclair/` refer to content previously available at the Original WorldOfSpectrum archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/World_of_Spectrum_June_2017_Mirror/World%20of%20Spectrum%20June%202017%20Mirror.zip/World%20of%20Spectrum%20June%202017%20Mirror/sinclair/
 
+Local file links starting with `/nvg/sinclair/` refer to content previously available at the ftp.nvg.unit.no archive. These files are currently accessible from [Archive.org](https://archive.org/) mirror at https://archive.org/download/mirror-ftp-nvg/Mirror_ftp_nvg.zip/sinclair/
+
 Local file links starting with `/zxdb/sinclair/` refer to content added afterwards. These files are currently stored at https://spectrumcomputing.co.uk/zxdb/sinclair/
 
 
