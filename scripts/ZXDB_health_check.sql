@@ -19,7 +19,7 @@ select * from (
     union all
         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'skipped sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where g.tagtype_id = 'S' and m.member_seq > 1 and m.member_seq-1 not in (select m2.member_seq from members m2 where m2.tag_id = m.tag_id)
     union all
-        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.member_seq is not null and g.tagtype_id not in ('S','C')
+        select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'invalid sequence number in tag that is not series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.member_seq is not null and g.tagtype_id not in ('S','C','D')
     union all
         select p.entry_id,e.title,p.publisher_seq-1,'skipped publisher sequence in publishers' from publishers p inner join entries e on p.entry_id = e.id where p.publisher_seq > 1 and p.publisher_seq-1 not in (select p2.publisher_seq from publishers p2 where p2.entry_id = p.entry_id and p2.release_seq = p.release_seq)
     union all
@@ -33,7 +33,7 @@ select * from (
     union all
         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
-        select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id not between 4000000 and 4999999
+        select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id < 1000000 
     union all
         select e.id,e.title,g.text,'books should have ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
     union all

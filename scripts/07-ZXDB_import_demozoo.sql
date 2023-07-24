@@ -5,7 +5,7 @@
 USE zxdb;
 
 -- Demo parties from Demozoo not in ZXDB
-select concat('insert into tags(id, name, tagtype_id, link) values ((select k from (select max(id)+1 as k from tags where tagtype_id=''C'') as x), ''',name,''', ''C'', ',if(website<>'',concat('''',website,''''),'null'),');') as qry
+select concat('insert into tags(id, name, tagtype_id, link) values ((select k from (select max(id)+1 as k from tags where tagtype_id=''D'') as x), ''',name,''', ''D'', ',if(website<>'',concat('''',website,''''),'null'),');') as qry
 from (
 select y.* from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
@@ -44,8 +44,8 @@ group by category
 order by category;
 
 -- Demo party members from Demozoo not in ZXDB
-select txt as 'insert into members(entry_id, tag_id, category_id, member_seq, variant) values' from (
-select concat('(',e.id,',',t.id,',',g.id,',',n.position,',''',(case when c.name like '%(normal results)' then 'normal results' when c.name like '%(alternative results)' then 'alternative results' else '*' end),'''),') as txt
+select concat('(',eid,',',tid,',',gid,',',position,',''',variant,'''),') as 'insert into members(entry_id, tag_id, category_id, member_seq, variant) values' from (
+select e.id as eid, t.id as tid, g.id as gid, n.position, (case when c.name like '%(normal results)' then 'normal results' when c.name like '%(alternative results)' then 'alternative results' else '*' end) as variant
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
@@ -55,9 +55,9 @@ inner join public.parties_party y on c.party_id = y.id
 inner join zxdb.tags t on t.name = y.name
 inner join zxdb.categories g on g.text = replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(c.name,'CAFePARTY 2019 Invitations','Invitation'),' Tiny Intro (256b)',' 256b Intro'),' Intro 256B',' 256b Intro'),' Intro 4KB',' 4K Intro'),' Byte ','b '),'Kb ','K '),'kb ','K '),'1k','1K'),'4k','4K'),'8-bit - ','8Bit '),'8-bit ','8Bit '),'8bit','8Bit'),' plattform ',' Platform '),' intro',' Intro'),'Oldskool demo','Oldskool Demo'),'(normal results)',''),'(alternative results)','')
 left join zxdb.members m on m.tag_id = t.id and m.entry_id = e.id and m.category_id = g.id
-where m.tag_id is null and t.id not in (2002)
+where m.tag_id is null and t.id not in (30046)
 union all
-select concat('(',e.id,',',t.id,',',g.id,',null,''*''),') as txt
+select e.id, t.id, g.id, null, '*'
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
@@ -68,7 +68,7 @@ inner join zxdb.categories g on g.text = 'Invitation'
 left join zxdb.members m on m.tag_id = t.id and m.entry_id = e.id
 where m.tag_id is null
 union all
-select concat('(',e.id,',',t.id,',null,null,''*''),') as txt
+select e.id, t.id, null, null, '*'
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
@@ -76,7 +76,7 @@ inner join public.parties_party_releases n on p.id = n.production_id
 inner join public.parties_party y on n.party_id = y.id
 inner join zxdb.tags t on t.name = y.name
 left join zxdb.members m on m.tag_id = t.id and m.entry_id = e.id
-where m.tag_id is null) as z;
+where m.tag_id is null) as z order by eid, tid, variant;
 
 -- Add missing Pouet links
 select concat('(',w.entry_id,', ''https://www.pouet.net/prod.php?which=',k.parameter,''', ''en'', 49),')
