@@ -1,4 +1,4 @@
--- [ZXDB] Import into ZXDB the list of files stored at WoS mirror from Archive.org.
+-- [ZXDB] Import into ZXDB the list of files stored in the WoS mirror at https://archive.org/details/World_of_Spectrum_June_2017_Mirror
 -- by Einar Saukas
 
 USE zxdb;

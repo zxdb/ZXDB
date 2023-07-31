@@ -153,6 +153,9 @@ insert into tmp_month (id, text) values
 
 insert into search_by_issues(issue_id, name) (select i.id, trim(concat(if(i.volume is not null,concat('v.',i.volume),''),if(i.number is not null,concat(' #',i.number),''),if(i.date_year is not null,concat(' - ',i.date_year,if(i.date_month is not null,concat('/',m.text,if(i.date_day is not null,concat('/',i.date_day),'')),'')),''),if(i.special is not null,concat(' special "',i.special,'"'),''),if(i.supplement is not null,concat(' supplement "',i.supplement,'"'),''))) from issues i left join tmp_month m on i.date_month = m.id);
 
+update search_by_issues set name = trim(substr(name,2)) where name like '- %';
+update search_by_issues set name = '?' where name = '';
+
 drop table tmp_month;
 
 

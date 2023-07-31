@@ -33,7 +33,7 @@ select * from (
     union all
         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
-        select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id < 1000000 
+        select e.id,e.title,t.text,'timex programs should have ID above 4000000' from entries e inner join machinetypes t on e.machinetype_id = t.id where t.text like 'Timex%' and e.id < 1000000
     union all
         select e.id,e.title,g.text,'books should have ID above 2000000' from entries e inner join genretypes g on e.genretype_id = g.id where g.text like 'Book%' and e.id not between 2000000 and 2999999
     union all
@@ -45,7 +45,7 @@ select * from (
     union all
         select e.id,e.title,g.text,'title with ID above 1000000 that is not hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
     union all
-        select e.id,e.title,d.file_link,'unknown file extension' from downloads d inner join entries e on d.entry_id = e.id left join extensions x on d.file_link like CONCAT('%',x.ext) where x.ext is null and d.file_link not like 'http%' and d.file_link not like '%.zip' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '%_SourceCode.tar.bz2'
+        select e.id,e.title,d.file_link,'unknown file extension' from downloads d inner join entries e on d.entry_id = e.id left join extensions x on d.file_link like CONCAT('%',x.ext) where x.ext is null and d.file_link not like 'http%' and d.file_link not like '%.zip' and d.file_link not like '/pub/sinclair/%' and d.file_link not like '/nvg/%' and d.file_link not like '%_SourceCode.tar.bz2'
     union all
         select null,null,concat(s.name,' / ',b.name),'license of "people" must not have owner' from licensors l inner join licenses s on l.license_id = s.id inner join labels b on b.id = l.label_id where s.licensetype_id = '-'
     union all
