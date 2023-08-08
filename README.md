@@ -11,7 +11,7 @@ For further details, visit the [ZXDB forum section](https://spectrumcomputing.co
 
 Simply download the latest database content, then load it into MySQL/MariaDB:
 
-* `ZXDB_mysql.sql` - The latest complete ZXDB database script for MySQL/MariaDB. That's all you really need!
+* `ZXDB_mysql.sql.zip` - The latest complete ZXDB database script for MySQL/MariaDB. That's all you really need!
 
 Optionally you can execute one of the provided scripts to convert file `ZXDB_mysql.sql` above to a different RDBMS:
 
@@ -21,17 +21,13 @@ Optionally you can execute one of the provided scripts to convert file `ZXDB_mys
 
 * `scripts/ZXDB_to_generic.groovy` - Groovy script to convert ZXDB into a (more) generic SQL
 
-The ZXDB distribution already includes all links to [RZX Archive](http://www.rzxarchive.co.uk/), but these links can also be updated independently. There's a separate script to import these links into ZXDB:
-
-* `scripts/ZXDB_import_rzx.sql` - Script to import [RZX Archive](http://www.rzxarchive.co.uk/) links from file [RZXArchiveZXDB.txt](https://spectrumcomputing.co.uk/RZXArchiveZXDB.txt)
-
-The ZXDB distribution already includes all links to [Speccy Screenshot Maps](http://maps.speccy.cz/), but these links can also be updated independently. There's another separate script to import these links into ZXDB:
-
-* `scripts/ZXDB_import_mapy.sql` - Script to import [Speccy Screenshot Maps](http://maps.speccy.cz/) links from file [mapy.txt](https://maps.speccy.cz/mapy.txt)
-
 There's also an optional script to create auxiliary tables, that can be used to help database searches. Ideally these tables must be repopulated whenever ZXDB content changes, or defined as materialized views in a RDBMS that supports it:
 
 * `scripts/ZXDB_help_search.sql` - Script to create auxiliary tables prefixed with `search_by_`
+
+The ZXDB distribution already includes links and references to integrated sites like [Speccy Screenshot Maps](http://maps.speccy.cz/) and [ZX-Spectrum Reviews (ZXSR)](http://zxspectrumreviews.co.uk/), but this information can also be updated independently. There are separate scripts to reimport them into ZXDB:
+
+* `scripts/*-ZXDB_import_*.sql` - Scripts to reimport information from integrated sites (additional details are explained in each file)
 
 Finally there's a script for health checking, that validates ZXDB consistency rules that cannot be enforced by check constraints:
 

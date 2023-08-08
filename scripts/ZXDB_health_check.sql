@@ -146,7 +146,7 @@ select * from (
         select e.id,e.title,t.text,'game editor for unidentified game' from entries e inner join genretypes t on e.genretype_id = t.id where e.genretype_id = 53 and e.id not in (select entry_id from relations where relationtype_id = 'e')
     union all
         select e.id,e.title,r.link,'mismatching web link' from entries e inner join webrefs r on r.entry_id = e.id inner join websites w on r.website_id = w.id where not (
-r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36,37) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
+r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wikipedia.org/wiki/%') or (r.website_id in (16,19,36,37) and r.link like 'https://youtu.be/%') or (r.website_id in (16,19,47) and r.link like 'https://www.youtube.com/%') or (r.website_id=31 and r.link like 'https://%.itch.io/%'))
     union all
         select e.id,e.title,concat(coalesce(r.release_year,'-'),'/',coalesce(r.release_month,'-'),'/',coalesce(r.release_day,'-'),' vs ',coalesce(i.date_year,'-'),'/',coalesce(i.date_month,'-'),'/',coalesce(i.date_day,'-')),'conflicting original publication date between tape and magazine' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join issues i on i.id = e.issue_id where e.genretype_id <> 81 and e.id not in (select entry_id from contents where is_original=1) and e.id not in (select entry_id from booktypeins where is_original=1) and e.id not in (select entry_id from magrefs where is_original=1) and (coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1))
     union all
@@ -213,8 +213,6 @@ select * from (
         select null,null,file_link,'file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select null,null,m.name,'label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
-    union all
-        select e.id,e.title,group_concat(b.name order by p.publisher_seq separator ' / '),'scene demo without Demozoo link' from entries e inner join publishers p on p.entry_id = e.id and p.release_seq = 0 inner join labels b on p.label_id = b.id where e.genretype_id = 79 and e.id not in (select entry_id from webrefs where website_id = 48) group by e.id
 ) as warnings
 order by entry_id, details;
 
