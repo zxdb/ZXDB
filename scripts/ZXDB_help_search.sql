@@ -246,4 +246,20 @@ insert into search_by_origins(entry_id, library_title, origintype_id, date_year,
 -- Library title
 update search_by_origins s inner join prefixes p on s.library_title like concat(p.text,'%') left join prefixexempts x on s.library_title like concat(x.text,'%') set s.library_title = trim(concat(substr(s.library_title,length(p.text)+1),', ',left(s.library_title, length(p.text)))) where x.text is null;
 
+
+-- Help search for aliases
+
+drop table if exists search_by_aliases;
+
+create table search_by_aliases (
+  entry_id int(11) not null,
+  title varchar(250) not null,
+  library_title varchar(300) collate utf8_unicode_ci not null,
+  primary key(entry_id, title)
+);
+
+insert into search_by_aliases(entry_id, title, library_title) (select entry_id, title, title from aliases group by entry_id, title);
+
+update search_by_aliases s inner join prefixes p on s.library_title like concat(p.text,'%') left join prefixexempts x on s.library_title like concat(x.text,'%') set s.library_title = trim(concat(substr(s.library_title,length(p.text)+1),', ',left(s.library_title, length(p.text)))) where x.text is null;
+
 -- END

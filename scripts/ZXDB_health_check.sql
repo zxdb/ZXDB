@@ -161,6 +161,10 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,k.title,'reciprocal relationship' from entries e inner join relations r1 on r1.entry_id = e.id inner join relations r2 on r1.entry_id = r2.original_id and r1.original_id = r2.entry_id inner join entries k on r1.original_id = k.id
     union all
         select null,null,concat(b.name,' [',c.text,'] x ',b2.name,' [',c2.text,']'),'mismatching countries' from labels b inner join countries c on b.country_id = c.id inner join labels b2 on b.owner_id = b2.id inner join countries c2 on b2.country_id = c2.id where b.labeltype_id='-' and c.id <> c2.id
+    union all
+        select e.id,e.title,g.text,'unidentified demoscene intro' from entries e inner join genretypes g on g.id = e.genretype_id inner join members m on m.entry_id = e.id inner join categories c on m.category_id = c.id where g.text like 'Demoscene%' and e.genretype_id not in (74,75) and c.text like '%Intro%'
+    union all
+        select e.id,e.title,k.title,'compilation inside another compilation' from entries e inner join genretypes g on e.genretype_id = g.id inner join contents c on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join genretypes g2 on k.genretype_id = g2.id where g.text like 'Compilation%' and g2.text like 'Compilation%'
 ) as warnings
 order by entry_id, details;
 
