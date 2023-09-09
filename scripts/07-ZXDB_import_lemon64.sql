@@ -32,10 +32,10 @@ alter table tmp_lemon add column lemon_link varchar(250);
 update tmp_lemon set lemon_link=concat('https://www.lemon64.com/game/',lemon_slug) where lemon_slug is not null;
 
 -- List mutual links stored in lemon64 but not in ZXDB
-select * from entries e
+select e.id, e.title, x.lemon_link from entries e
 inner join tmp_lemon x on e.id = x.entry_id
 left join ports p on p.entry_id = e.id and p.platform_id = 7 and p.link_system = x.lemon_link
-where p.id is null;
+where p.id is null order by e.id;
 
 -- List mutual links stored in ZXDB but not in lemon64 (except never released titles)
 select * from entries e
