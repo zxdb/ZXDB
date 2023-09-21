@@ -67,7 +67,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-open-[0-9]\.'
     union all
-        select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'')
+        select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'') and coalesce(i1.date_year,'') = coalesce(i2.date_year,'')
     union all
         select null,null,concat(m.name,' ',i1.date_year,'/',i1.date_month),'duplicated magazine issue' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number is null and i2.number is null and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'') and coalesce(i1.date_year,-1) = coalesce(i2.date_year,-1) and coalesce(i1.date_month,-1) = coalesce(i2.date_month,-1) and coalesce(i1.date_day,-1) = coalesce(i2.date_day,-1)
     union all
@@ -82,8 +82,6 @@ select * from (
         select e.id,e.title,d.file_link,'file located in wrong directory' from downloads d inner join entries e on e.id = d.entry_id where d.file_link like '/zxdb/sinclair/entries%' and d.file_link not like concat('%',lpad(entry_id,7,'0'),'%')
     union all
         select null,null,concat(t.text,': ',g.name,' (',g.id,')'),'tag without any members' from tags g inner join tagtypes t on t.id = g.tagtype_id where g.id not in (select tag_id from members)
-    union all
-        select e.id,e.title,concat(t.text,': ',g.name,' (',g.id,')'),'series (or set) with a single title' from tags g inner join tagtypes t on g.tagtype_id = t.id inner join members m on m.tag_id = g.id inner join entries e on m.entry_id = e.id left join members m2 on m2.tag_id = g.id and m2.entry_id <> m.entry_id where m2.entry_id is null and t.id in ('S','U')
     union all
         select null,null,concat('License: ',name,' (',id,')'),'license without any entries' from licenses where id not in (select license_id from relatedlicenses)
     union all
@@ -162,9 +160,11 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select null,null,concat(b.name,' [',c.text,'] x ',b2.name,' [',c2.text,']'),'mismatching countries' from labels b inner join countries c on b.country_id = c.id inner join labels b2 on b.owner_id = b2.id inner join countries c2 on b2.country_id = c2.id where b.labeltype_id='-' and c.id <> c2.id
     union all
-        select e.id,e.title,g.text,'unidentified demoscene intro' from entries e inner join genretypes g on g.id = e.genretype_id inner join members m on m.entry_id = e.id inner join categories c on m.category_id = c.id where g.text like 'Demoscene%' and e.genretype_id not in (74,75) and c.text like '%Intro%'
+        select e.id,e.title,g.text,'unidentified demoscene intro' from entries e inner join genretypes g on g.id = e.genretype_id inner join members m on m.entry_id = e.id inner join categories c on m.category_id = c.id where g.text like 'Demoscene%' and e.genretype_id not in (74,75) and c.text like '%Intro%' and c.text not like '%Intro/Demo%'
     union all
         select e.id,e.title,k.title,'compilation inside another compilation' from entries e inner join genretypes g on e.genretype_id = g.id inner join contents c on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join genretypes g2 on k.genretype_id = g2.id where g.text like 'Compilation%' and g2.text like 'Compilation%'
+    union all
+        select e.id,e.title,d.file_link,'invalid screenshot' from entries e inner join downloads d on d.entry_id = e.id where file_link like '%.scr' and file_size not in (6912,6928,6976,12288,12289)
 ) as warnings
 order by entry_id, details;
 
@@ -217,6 +217,8 @@ select * from (
         select null,null,file_link,'file to be identified and moved to table "downloads"' from files where label_id is null and issue_id is null and tool_id is null and (file_link like '/pub/sinclair/books-pics/%' or file_link like '/pub/sinclair/games-%' or file_link like '/pub/sinclair/hardware-%' or file_link like '/pub/sinclair/slt/%' or file_link like '/pub/sinclair/technical-%' or file_link like '/pub/sinclair/zx81/%')
     union all
         select null,null,m.name,'label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
+    union all
+        select e.id,e.title,concat(t.text,': ',g.name,' (',g.id,')'),'series (or set) with a single title' from tags g inner join tagtypes t on g.tagtype_id = t.id inner join members m on m.tag_id = g.id inner join entries e on m.entry_id = e.id left join members m2 on m2.tag_id = g.id and m2.entry_id <> m.entry_id where m2.entry_id is null and t.id in ('S','U')
 ) as warnings
 order by entry_id, details;
 
