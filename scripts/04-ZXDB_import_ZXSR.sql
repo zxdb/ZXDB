@@ -17,7 +17,7 @@ delete from magreffeats where magref_id >= 300000;
 delete from magrefs where id >= 300000;
 update magrefs set review_id = null where 1=1;
 -- update magrefs set award_id = null where 1=1;
-update magrefs set award_id = null where award_id not in (1,50);
+update magrefs set award_id = null where award_id <> 50;
 update magrefs set score_group='' where score_group not in ('Classic Adventure','Colossal Caves');
 delete from zxsr_reviews where 1=1;
 
@@ -132,7 +132,7 @@ inner join magrefs r on c.game_id = r.entry_id and z.zxdb_issue_id = r.issue_id 
 order by r.id, c.header_order);
 
 -- Identify overall scores
-update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq > s1.score_seq set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or s1.category = 'ACE Rating' or s1.category = 'Verdict' or (s1.category like 'Overall%' and s1.category not like 'Overall (%') and s1.score not like '%K)');
+update zxsr_scores s1 left join zxsr_scores s2 on s1.magref_id = s2.magref_id and s2.score_seq > s1.score_seq set s1.is_overall = 1 where s2.magref_id is null and (s1.score_seq = 1 or s1.category = 'Ace Rating' or s1.category = 'ACE Rating' or s1.category = 'Verdict' or (s1.category like 'Overall%' and s1.category not in ('Overall (Richard Eddy)','Overall (Dominic Handy)')) and s1.score not like '%K)');
 
 -- Store review picture descriptions in ZXDB
 alter table zxsr_captions drop primary key;

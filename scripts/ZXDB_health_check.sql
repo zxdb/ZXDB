@@ -165,6 +165,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,k.title,'compilation inside another compilation' from entries e inner join genretypes g on e.genretype_id = g.id inner join contents c on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join genretypes g2 on k.genretype_id = g2.id where g.text like 'Compilation%' and g2.text like 'Compilation%'
     union all
         select e.id,e.title,d.file_link,'invalid screenshot' from entries e inner join downloads d on d.entry_id = e.id where file_link like '%.scr' and file_size not in (6912,6928,6976,12288,12289)
+    union all
+        select e.id,e.title,k.title,'program can either support or require hardware (not both)' from entries e inner join relations r1 on r1.entry_id = e.id and r1.relationtype_id = 'h' inner join entries k on r1.original_id = k.id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = 't' and r2.original_id = k.id
 ) as warnings
 order by entry_id, details;
 
