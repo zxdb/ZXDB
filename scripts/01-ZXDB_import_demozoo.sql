@@ -32,7 +32,7 @@ order by name;
 -- Categories from Demozoo not in ZXDB
 select concat('(''',category,'''),') as 'insert into categories(text) values'
 from (
-select replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(c.name,'CAFePARTY 2019 Invitations','Invitation'),' Tiny Intro (256b)',' 256b Intro'),' Intro 256B',' 256b Intro'),' Intro 4KB',' 4K Intro'),'640k ','640K '),' Byte ','b '),'Kb ','K '),'kb ','K '),'1k','1K'),'4k','4K'),'8-bit - ','8Bit '),'8-bit ','8Bit '),'8bit','8Bit'),' plattform ',' Platform '),' intro',' Intro'),' demo',' Demo'),'(normal results)',''),'(alternative results)','') as category
+select replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(c.name,'CAFePARTY 2019 Invitations','Invitation'),' Tiny Intro (256b)',' 256b Intro'),' Intro 256B',' 256b Intro'),' Intro 4KB',' 4K Intro'),' Intro 4Kb',' 4K Intro'),' Intro 4k',' 4K Intro'),'640k ','640K '),' Byte ','b '),'Kb ','K '),'kb ','K '),'1k','1K'),'4k','4K'),'8-bit - ','8Bit '),'8-bit ','8Bit '),'8bit','8Bit'),' plattform ',' Platform '),' intro',' Intro'),' demo',' Demo'),'(normal results)',''),'(alternative results)','') as category
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
@@ -53,7 +53,7 @@ inner join public.parties_competitionplacing n on p.id = n.production_id
 inner join public.parties_competition c on n.competition_id = c.id
 inner join public.parties_party y on c.party_id = y.id
 inner join zxdb.tags t on t.name = y.name
-inner join zxdb.categories g on g.text = replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(c.name,'CAFePARTY 2019 Invitations','Invitation'),' Tiny Intro (256b)',' 256b Intro'),' Intro 256B',' 256b Intro'),' Intro 4KB',' 4K Intro'),'640k ','640K '),' Byte ','b '),'Kb ','K '),'kb ','K '),'1k','1K'),'4k','4K'),'8-bit - ','8Bit '),'8-bit ','8Bit '),'8bit','8Bit'),' plattform ',' Platform '),' intro',' Intro'),' demo',' Demo'),'(normal results)',''),'(alternative results)','')
+inner join zxdb.categories g on g.text = replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(c.name,'CAFePARTY 2019 Invitations','Invitation'),' Tiny Intro (256b)',' 256b Intro'),' Intro 256B',' 256b Intro'),' Intro 4KB',' 4K Intro'),' Intro 4Kb',' 4K Intro'),' Intro 4k',' 4K Intro'),'640k ','640K '),' Byte ','b '),'Kb ','K '),'kb ','K '),'1k','1K'),'4k','4K'),'8-bit - ','8Bit '),'8-bit ','8Bit '),'8bit','8Bit'),' plattform ',' Platform '),' intro',' Intro'),' demo',' Demo'),'(normal results)',''),'(alternative results)','')
 left join zxdb.members m on m.tag_id = t.id and m.entry_id = e.id and m.category_id = g.id
 where m.tag_id is null and t.id not in (30046)
 union all
