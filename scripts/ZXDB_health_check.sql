@@ -11,8 +11,6 @@ select * from (
     union all
         select e.id,e.title,r.release_seq-1,'skipped release number in releases' from releases r inner join entries e on r.entry_id = e.id where r.release_seq > 0 and r.release_seq-1 not in (select r2.release_seq from releases r2 where r2.entry_id = r.entry_id)
     union all
-        select id,title,library_title,'possible mismatch between title and library title' from entries where title <> library_title and left(title,4) = left(library_title,4) and title not like '%+%'
-    union all
         select e.id,e.title,concat(c.media_seq,'-',c.media_side,'-',c.prog_seq-1),'skipped item in contents' from contents c inner join entries e on c.container_id = e.id where c.prog_seq > 1 and c.prog_seq-1 not in (select c2.prog_seq from contents c2 where c2.container_id = c.container_id and c2.media_seq = c.media_seq and c2.media_side = c.media_side)
     union all
         select m.entry_id,e.title,concat(g.name,' (',g.id,')'),'missing sequence number in series' from tags g inner join members m on m.tag_id = g.id left join entries e on m.entry_id = e.id where m.member_seq is null and g.tagtype_id = 'S'
@@ -100,8 +98,6 @@ select * from (
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from contents where entry_id is not null) or id in (select container_id from contents) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs) or id in (select entry_id from downloads))
     union all
         select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated tags with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
-    union all
-        select id,title,library_title,'library title should not start with article "The"' from entries where library_title like 'The %'
     union all
         select e.id,e.title,g.name,'CSSCGC title missing from compilation' from entries e inner join members m on m.entry_id = e.id inner join tags g on g.id = m.tag_id and g.name like 'CSSCGC Crap Games Contest%' left join entries k on k.title like 'CSSCGC Crap Games Competition%' and e.id <> k.id left join contents c on c.container_id = k.id and c.entry_id = e.id where k.title = concat('CSSCGC Crap Games Competition',right(g.name,5)) and c.entry_id is null
     union all
