@@ -217,6 +217,8 @@ select * from (
         select null,null,m.name,'label and magazine with same name' from magazines m inner join labels b on m.name = b.name where b.name not in ('48K','Gamestar','Kiddisoft','Maximum')
     union all
         select e.id,e.title,concat(t.text,': ',g.name,' (',g.id,')'),'series (or set) with a single title' from tags g inner join tagtypes t on g.tagtype_id = t.id inner join members m on m.tag_id = g.id inner join entries e on m.entry_id = e.id left join members m2 on m2.tag_id = g.id and m2.entry_id <> m.entry_id where m2.entry_id is null and t.id in ('S','U')
+    union all
+        select e.id,e.title,t.name,'demoparty title without category' from entries e inner join members m on m.entry_id = e.id inner join tags t on m.tag_id = t.id where t.tagtype_id = 'D' and m.category_id is null
 ) as warnings
 order by entry_id, details;
 
