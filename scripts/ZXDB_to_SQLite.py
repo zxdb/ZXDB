@@ -16,7 +16,9 @@ with codecs.open(r"ZXDB_mysql.sql",'r','utf-8') as f:
             # convert escaped single quotes
             line = line.replace(r"\'","''") 
             # change collation 
-            line = line.replace('utf8_bin','rtrim') 
+            line = line.replace('utf8_bin','rtrim').replace('utf8_unicode_ci','rtrim')
+            # remove character set
+            line = line.replace('CHARACTER SET utf8', '')
             # get rid of auto-increment, as SQLite doesn't support it well enough
             line = line.replace('AUTO_INCREMENT','') 
             # tidy up MySql-isms from end of table definitions
