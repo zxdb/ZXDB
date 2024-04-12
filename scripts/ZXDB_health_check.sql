@@ -23,7 +23,7 @@ select * from (
     union all
         select e.id,e.title,text,'malformed reference to another entry in notes' from notes n left join entries e on e.id = n.entry_id where (text like '%{%}%' and text not like '%{%|%|%}%') or (text like '%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%') or (text like '%{%}%{%}%{%}%' and text not like '%{%|%|%}%{%|%|%}%{%|%|%}%') or text regexp '[a-zA-Z]}'
     union all
-        select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032)
+        select e.id,e.title,g.text,'program authored with another program that is not programming tool or utility' from relations r inner join entries e on r.original_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'a' and g.text not like 'Utility:%' and g.text not like 'Programming:%' and r.original_id not in (3032,9230)
     union all
         select e.id,e.title,g.text,'game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
@@ -113,7 +113,7 @@ select * from (
     union all
         select e.id,e.title,null,'redundant alias identical to entry title' from entries e inner join aliases a on e.id = a.entry_id and a.release_seq = 0 where a.title = e.title
     union all
-        select e.id,e.title,null,'missing playable file from recovered title' from entries e where e.availabletype_id = 'R' and e.id not in (select entry_id from downloads where filetype_id in (8,10,11,17) and is_demo=0)
+        select e.id,e.title,null,'missing playable file from recovered title' from entries e where e.availabletype_id = 'R' and e.id not in (select entry_id from downloads where filetype_id in (8,10,11,17) and is_demo=0) and e.id not in (41770)
     union all
         select e.id,e.title,d.file_link,'playable file from never released title' from entries e inner join downloads d on d.entry_id = e.id where e.availabletype_id = 'N' and d.filetype_id in (8,10,11,17) and d.is_demo = 0
     union all
@@ -148,9 +148,9 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select e.id,e.title,null,'inconsistent or missing information in CSSCGC compilation' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where e.title like 'CSSCGC%' and (r.release_year is null or r.release_month is not null or e.title <> concat('CSSCGC Crap Games Competition ',r.release_year) or e.genretype_id is null or e.genretype_id <> 80 or e.id not in (select entry_id from members where tag_id=3581))
     union all
-        select null,e1.title,concat(e1.id,' and ',e2.id),'duplicated type-in entry' from issues i inner join magrefs r1 on r1.issue_id = i.id and r1.is_original = 1 inner join magrefs r2 on r2.issue_id = i.id and r2.is_original = 1 and r2.entry_id > r1.entry_id inner join entries e1 on e1.id = r1.entry_id inner join entries e2 on e2.id = r2.entry_id left join relations k on (k.entry_id = e1.id and k.original_id = e2.id) or (k.entry_id = e2.id and k.original_id = e1.id) where e1.title = e2.title and k.entry_id is null
+        select null,e1.title,concat(e1.id,' and ',e2.id),'duplicated type-in entry' from issues i inner join magrefs r1 on r1.issue_id = i.id and r1.is_original = 1 inner join magrefs r2 on r2.issue_id = i.id and r2.is_original = 1 and r2.entry_id > r1.entry_id inner join entries e1 on e1.id = r1.entry_id inner join entries e2 on e2.id = r2.entry_id left join relations k on (k.entry_id = e1.id and k.original_id = e2.id) or (k.entry_id = e2.id and k.original_id = e1.id) where e1.title = e2.title and k.entry_id is null and (r1.page = 0 or r2.page = 0 or r1.page = r2.page)
     union all
-        select e.id,e.title,k.title,'conflicting original publication date in CSSCGC entry' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.container_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join contents t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.container_id < t.container_id where t2.container_id is null and k.id in (select entry_id from members where tag_id=3581) and r.release_year is not null and r.release_year <> s.release_year and r.release_year <> s.release_year+1
+        select e.id,e.title,k.title,'conflicting original publication date in CSSCGC entry' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join contents t on t.entry_id = e.id and t.is_original = 1 inner join entries k on k.id = t.container_id inner join releases s on s.entry_id = k.id and s.release_seq = 0 left join contents t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.container_id < t.container_id where t2.container_id is null and k.id in (select entry_id from members where tag_id=3581) and r.release_year is not null and r.release_year <> s.release_year and r.release_year <> s.release_year+1 and e.id not in (42688)
     union all
         select e.id,e.title,k.title,'reciprocal relationship' from entries e inner join relations r1 on r1.entry_id = e.id inner join relations r2 on r1.entry_id = r2.original_id and r1.original_id = r2.entry_id inner join entries k on r1.original_id = k.id
     union all
