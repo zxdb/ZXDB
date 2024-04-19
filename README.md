@@ -287,15 +287,15 @@ ZXDB was created and it's maintained by **Einar Saukas**, with very special than
 
 * **Thomas Kolbeck**: for directly working on ZXDB, maintaining the ZX81 section of ZXDB, and implementing the open [ZXInfo API](https://api.zxinfo.dk/v3/);
 
-* **Elia Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries (and also providing inumerous other contributions to ZXDB content);
+* **Elia Iliashenko**: for maintaining in [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) a complete mapping of TOSEC files to their corresponding ZXDB entries, and providing inumerous other contributions to ZXDB content;
 
-* **Peter Jones**, and **Ricardo Nunes**: for building [Spectrum Computing](https://spectrumcomputing.co.uk/) that hosts the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) (and also providing inumerous other contributions to ZXDB content);
+* **Peter Jones**, and **Ricardo Nunes**: for building [Spectrum Computing](https://spectrumcomputing.co.uk/) that hosts both the [ZXDB forum section](https://spectrumcomputing.co.uk/forums/viewforum.php?f=32) and the [online preservation forms](https://spectrumcomputing.co.uk/help.php), and providing inumerous other contributions to ZXDB content;
 
 * **Steven Brown**: for recovering and preserving a huge amount of rare programs at [TZXVault](https://tzxvault.org/), and helping to add them to ZXDB;
 
 * **Andre Luna Leao**: for collecting all kinds of programs at [Planeta Sinclair](https://planetasinclair.blogspot.com/), and helping to add them to ZXDB;
 
-* **Hikoki**, **Neil Parsons** and everybody else that have contributed, assisted and supported this project since the beginning!
+* **Hikoki**, **Frankie**, **Neil Parsons** and everybody else that have contributed, assisted and supported this project since the beginning!
 
 Also special thanks to everyone that contributed to the creation of ZXDB, particularly:
 
@@ -363,6 +363,12 @@ The following websites are fully integrated with ZXDB:
 * [Wikipedia](https://en.wikipedia.org/) - Each ZXDB title, person or company links to the corresponding webpage at Wikipedia.
 
 * [MobyGames](http://www.mobygames.com/) - Each ZXDB title links to the corresponding webpage at MobyGames.
+
+* [Universal Videogame List](https://www.uvlist.net/) - Each ZXDB title links to the corresponding webpage at UVL.
+
+* [Games That Weren't](https://www.gamesthatwerent.com/) - Each never released ZXDB title (or port to another platform) links to the corresponding webpage at **Frank Gasking**'s site.
+
+* [The Cutting Room Floor](https://tcrf.net/) - Each ZXDB title with hidden content links to the corresponding webpage at TCRF.
 
 * [Lost in Translation](http://www.exotica.org.uk/) - Each ZXDB title links to the corresponding webpage at Lost in Translation.
 

@@ -4,9 +4,8 @@
 USE zxdb;
 
 -- BUGFIXES!
--- update zxsr.ssd_review_score_compilations c set game_id=746 where game_id=853;   -- Buggy Boy
--- update zxsr.ssd_review_score_compilations c set game_id=2482 where game_id=2483; -- Infiltrator
-select * from zxsr.ssd_review_picture s where s.ReviewId not in (select review_id from zxsr.ssd_review);
+delete from zxsr.ssd_review_score where score_id=75052; -- duplicated
+delete from zxsr.ssd_review_score where review_id in (6993,6995,6996); -- duplicated
 
 -- Delete previous ZXSR imports
 delete from zxsr_captions where 1=1;
