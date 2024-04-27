@@ -63,7 +63,7 @@ select * from (
     union all
         select e.id,e.title,d.file_link,'running screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 2 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-run-[0-9]\.' and d.file_link not like '%-RUN-%'
     union all
-        select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-open-[0-9]\.'
+        select e.id,e.title,d.file_link,'opening screen does not follow filename convention' from entries e inner join downloads d on d.entry_id = e.id where d.filetype_id = 3 and d.file_link regexp '/zxdb/sinclair/entries/[0-9]*/[0-9]{3}.*' and d.file_link not regexp '^/zxdb/sinclair/entries/[0-9]{7}/[0-9]{7}-open-[0-9]\.' and d.file_link not like concat('%/',replace(e.title,' ',''),'-OPEN-%')
     union all
         select null,null,concat(m.name,' #',i1.number),'duplicated magazine number' from issues i1 inner join magazines m on m.id = i1.magazine_id inner join issues i2 on i1.id < i2.id and i1.magazine_id = i2.magazine_id and i1.number = i2.number and coalesce(i1.volume, -1) = coalesce(i2.volume, -1) and coalesce(i1.special,'') = coalesce(i2.special,'') and coalesce(i1.supplement,'') = coalesce(i2.supplement,'') and coalesce(i1.date_year,'') = coalesce(i2.date_year,'')
     union all
@@ -97,7 +97,7 @@ select * from (
     union all
         select id,title,null,'deprecated entry containing possibly redundant data' from entries where availabletype_id = '*' and (id in (select entry_id from aliases) or id in (select entry_id from authors) or id in (select entry_id from booktypeins) or id in (select book_id from booktypeins) or id in (select entry_id from contents where entry_id is not null) or id in (select container_id from contents) or id in (select entry_id from magrefs where entry_id is not null) or id in (select entry_id from members) or id in (select entry_id from ports) or id in (select entry_id from publishers) or id in (select entry_id from relatedlicenses) or id in (select entry_id from relations where relationtype_id <> '*') or id in (select original_id from relations) or id in (select entry_id from remakes) or id in (select entry_id from webrefs) or id in (select entry_id from downloads))
     union all
-        select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated tags with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k
+        select null,null,concat(g1.name,' (',g1.id,') x ',g2.name,' (',g2.id,')'),'possibly duplicated tags with same elements' from (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g1 inner join (select g.id, g.name, group_concat(m.entry_id order by m.entry_id separator ',') as k from tags g left join members m on m.tag_id = g.id group by g.id) as g2 on g1.id < g2.id and g1.k = g2.k where g1.name not like 'NOMAM %' and g2.name not like 'NOMAM %'
     union all
         select e.id,e.title,g.name,'CSSCGC title missing from compilation' from entries e inner join members m on m.entry_id = e.id inner join tags g on g.id = m.tag_id and g.name like 'CSSCGC Crap Games Contest%' left join entries k on k.title like 'CSSCGC Crap Games Competition%' and e.id <> k.id left join contents c on c.container_id = k.id and c.entry_id = e.id where k.title = concat('CSSCGC Crap Games Competition',right(g.name,5)) and c.entry_id is null
     union all
@@ -163,6 +163,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,d.file_link,'invalid screenshot' from entries e inner join downloads d on d.entry_id = e.id where file_link like '%.scr' and file_size not in (6912,6928,6976,12288,12289)
     union all
         select e.id,e.title,k.title,'program can either support or require hardware (not both)' from entries e inner join relations r1 on r1.entry_id = e.id and r1.relationtype_id = 'h' inner join entries k on r1.original_id = k.id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = 't' and r2.original_id = k.id
+    union all
+        select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1)) and e.id > 39000
 ) as warnings
 order by entry_id, details;
 
@@ -202,8 +204,6 @@ select * from (
     union all
         select e.id,e.title,m.name,'conflicting original publication date in magazine type-in' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 inner join magrefs t on t.entry_id = e.id and t.is_original = 1 inner join issues i on i.id = t.issue_id inner join magazines m on m.id = i.magazine_id left join magrefs t2 on t2.entry_id = e.id and t2.is_original = 1 and t2.issue_id < i.id where t2.id is null and r.release_year is not null and (coalesce(r.release_year,-1) <> coalesce(i.date_year,-1) or coalesce(r.release_month,-1) <> coalesce(i.date_month,-1) or coalesce(r.release_day,-1) <> coalesce(i.date_day,-1))
     union all
-        select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
-    union all
         select e.id,e.title,null,'conflicting original price' from entries e inner join releases r on r.entry_id = e.id and r.release_seq = 0 where r.currency_id is not null and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
     union all
         select e.id,e.title,n.text,'note to be converted into compilation or relation' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Came%'
@@ -219,6 +219,10 @@ select * from (
         select e.id,e.title,concat(t.text,': ',g.name,' (',g.id,')'),'series (or set) with a single title' from tags g inner join tagtypes t on g.tagtype_id = t.id inner join members m on m.tag_id = g.id inner join entries e on m.entry_id = e.id left join members m2 on m2.tag_id = g.id and m2.entry_id <> m.entry_id where m2.entry_id is null and t.id in ('S','U')
     union all
         select e.id,e.title,t.name,'demoparty title without category' from entries e inner join members m on m.entry_id = e.id inner join tags t on m.tag_id = t.id where t.tagtype_id = 'D' and m.category_id is null
+    union all
+        select e.id,e.title,concat(m.name,' - issue_id ',r1.issue_id,' pg ',r1.page,' vs issue_id ',r2.issue_id,' pg ',r2.page),'mismatching review reference with ZXSR' from entries e inner join magrefs r1 on r1.entry_id = e.id and r1.referencetype_id = 10 and r1.review_id is null inner join issues i1 on r1.issue_id = i1.id inner join magazines m on i1.magazine_id = m.id inner join magrefs r2 on r2.entry_id = e.id and r2.referencetype_id = 10 and r2.review_id is not null inner join issues i2 on r2.issue_id = i2.id and i2.magazine_id = i1.magazine_id and r1.id not in (select magref_id from magreffeats where feature_id=6455)
+    union all
+        select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
 ) as warnings
 order by entry_id, details;
 
