@@ -38,7 +38,8 @@ left join ports p on p.entry_id = e.id and p.platform_id = 7 and p.link_system =
 where p.id is null order by e.id;
 
 -- List mutual links stored in ZXDB but not in lemon64 (except never released titles)
-select * from entries e
+select e.id as zxdb_id,e.title as spectrum_title,coalesce(p.title,e.title) as c64_title,p.link_system
+from entries e
 inner join ports p on p.entry_id = e.id and p.platform_id = 7
 left join tmp_lemon x on e.id = x.entry_id and p.link_system = x.lemon_link
 where p.link_system like 'https://www.lemon64.com/%'
@@ -56,9 +57,10 @@ and x.lemon_id is null
 order by e.title;
 
 -- List of ZXDB titles missing links to corresponding C64 titles
-select e.id,e.title,GROUP_CONCAT(b.name ORDER BY k.publisher_seq SEPARATOR ' / ') as publishers
+select e.id,e.title,GROUP_CONCAT(b.name ORDER BY k.publisher_seq SEPARATOR ' / ') as publishers,g.text as genre
 from entries e
 inner join ports p on p.entry_id = e.id and p.platform_id = 7
+left join genretypes g on e.genretype_id = g.id
 left join publishers k on k.entry_id = e.id and k.release_seq = 0 
 left join labels b on k.label_id = b.id
 where coalesce(e.genretype_id,0) < 80
