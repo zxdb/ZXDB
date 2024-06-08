@@ -26,14 +26,14 @@ with codecs.open(r"ZXDB_mysql.sql",'r','utf-8') as f:
                 line =')'          
 
             # SQLite doesn't like unsigned, so manually convert to an integer
-            line = re.sub('int\s*\(\d+\)\s+unsigned','INTEGER',line, flags=re.I)
+            line = re.sub(r'int\s*\(\d+\)\s+unsigned','INTEGER',line, flags=re.I)
 
             # strip out indexes
-            if re.match('\s*KEY',line,re.I):
+            if re.match(r'\s*KEY',line,re.I):
                 line = '' 
 
             # fix unique constraint syntax and remove names
-            line = re.sub('\s*UNIQUE KEY \w*\s*\(','UNIQUE (',line)
+            line = re.sub(r'\s*UNIQUE KEY \w*\s*\(','UNIQUE (',line)
 
             outFile.write(line)
             
