@@ -56,12 +56,6 @@ The ZXDB schema is described below:
   * `{s#}` - magazine special issue string, preceded by character '#'
   * `{u#}` - magazine issue supplement string, preceded by character '#'
 
-* `releases` - each release of an item (date, price, publisher, etc)
-  * `release_seq=0` - original release
-  * `release_seq=1` - 1st re-release
-  * `release_seq=2` - 2nd re-release
-  * `...`
-
 * `tools` - Spectrum-related cross-platform utilities and development tools (emulators, compilers, editors, etc)
 
 * `websites` - main websites that provide information about items (MobyGames, Tipshop, Wikipedia, etc). The website link mask follows this convention:
@@ -91,6 +85,12 @@ The ZXDB schema is described below:
 * `nvgs` - oldest files preserved from ftp.nvg.unit.no
 
 * `ports` - Spectrum programs also released on other platforms
+
+* `releases` - each release of an item (date, price, publisher, etc)
+  * `release_seq=0` - original release
+  * `release_seq=1` - 1st re-release
+  * `release_seq=2` - 2nd re-release
+  * `...`
 
 * `remakes` - modern remakes of Spectrum programs
 
@@ -123,7 +123,7 @@ The ZXDB schema is described below:
 * `magreflinks` - associate magazine references to links about them
 
 * `members` - associate tags to their list of programs
-  * `series_seq` - only required for sequenced series
+  * `series_seq` - required for sequenced series, optional for competitions and demoparties
 
 * `permissions` - associate labels to distribution permissions granted to websites
 
@@ -141,7 +141,7 @@ The ZXDB schema is described below:
 * `webrefs` - associate programs to webpages about them at other main websites
 
 
-#### _ENUMERATION TABLES_
+#### _DOMAIN TABLES_
 
 * `articletypes` - list of article types (profile, interview, memoir, etc)
 
@@ -152,6 +152,10 @@ The ZXDB schema is described below:
   * `Distribution denied - still for sale` - items unauthorized for distribution
   * `Never released` - items never released (for whatever reason)
   * `Never released - recovered` - items never officially released, later recovered/preserved
+
+* `casetypes` - list of media case types (jewel, clamshell, cardbox, etc)
+
+* `categories` - list of competition or demoparty categories
 
 * `contenttypes` - list of content types in compilations, covertapes or electronic magazines (full version, demo, soundtrack only, etc)
 
@@ -180,6 +184,8 @@ The ZXDB schema is described below:
   * `ZX-Spectrum 128K (load in USR0 mode)` - programs that require (at least) 128K, and must be loaded in USR0 mode
   * `...`
 
+* `magtypes` - list of magazine types (paper, electronic, etc)
+
 * `notetypes` - list of note types (awards, errors, etc)
 
 * `origintypes` - list of indirect original publication types (covertape from magazine, type-in from book, etc)
@@ -191,6 +197,10 @@ The ZXDB schema is described below:
   * `Non-copyright holder` - person or company reported not being copyright owner anymore (must check text for further details)
 
 * `platforms` - list of computer platforms
+
+* `prefixes` - list of name prefixes ("The", "An", etc) to be excluded when ordering program titles
+
+* `prefixexempts` - list of exception cases when ordering program titles
 
 * `referencetypes` - references from magazines about entries or labels (preview, review, advert, type-in, solution, etc)
 
