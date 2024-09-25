@@ -39,7 +39,7 @@ select * from (
     union all
         select e.id,e.title,t.text,'title with ID above 4000000 that is not timex program' from entries e left join machinetypes t on e.machinetype_id = t.id where coalesce(t.text,'?') not like 'Timex%' and e.id between 4000000 and 4999999
     union all
-        select e.id,e.title,g.text,'title with ID above 2000000 that is not book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999
+        select e.id,e.title,g.text,'title with ID above 2000000 that is not book' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Book%' and e.id between 2000000 and 2999999 and e.availabletype_id<>'*'
     union all
         select e.id,e.title,g.text,'title with ID above 1000000 that is not hardware device' from entries e left join genretypes g on e.genretype_id = g.id where coalesce(g.text,'') not like 'Hardware%' and e.id between 1000000 and 1999999
     union all
