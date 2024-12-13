@@ -146,12 +146,13 @@ The ZXDB schema is described below:
 * `articletypes` - list of article types (profile, interview, memoir, etc)
 
 * `availabletypes` - list of availability status for entries:
-  * `MIA` - released items not (yet) found/preserved
-  * `Available` - released items already preserved
-  * `Distribution denied` - items unauthorized for distribution
-  * `Distribution denied - still for sale` - items unauthorized for distribution
-  * `Never released` - items never released (for whatever reason)
-  * `Never released - recovered` - items never officially released, later recovered/preserved
+  * `MIA` - released products that are not (yet) found/preserved anywhere
+  * `Available` - released products preserved here
+  * `Not archived (available elsewhere)` - released products only available for download elsewhere
+  * `Distribution denied` - products whose author/owner explicitly prohibited free distribution
+  * `Distribution denied - still for sale` - products whose author/owner explicitly prohibited free distribution because they are still sold somewhere
+  * `Never released` - products never released (for whatever reason)
+  * `Never released - recovered` - products never officially released but later recovered/preserved
 
 * `casetypes` - list of media case types (jewel, clamshell, cardbox, etc)
 
@@ -214,13 +215,19 @@ The ZXDB schema is described below:
 
 * `tagtypes` - list of tag types:
   * `Series` - programs from the same series, following a specific order
-  * `Unsorted Group` - programs from the same collection, but without any specific order
+  * `Unsorted Set` - programs from the same collection, but without any specific order
+  * `Demoparty` - programs that participated in a certain demoparty
+  * `Competition` - programs that participated in a certain competition (outside a demoparty)
+  * `Sport` - programs based on a certain sport (Soccer, Cycling, etc)
   * `Theme` - programs that share the same theme (Ancient Mythology, Christmas, etc)
-  * `Feature` - programs that share the same feature (isometric 3D graphics, AY support, etc)
-  * `Competition` - programs that participated in the same competition
-  * `Multiplay Mode` - programs that support a certain multiplayer mode (Cooperative, Teamplay, Versus)
-  * `Turn Mode` - programs that support a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
-  * `Control Option` - programs that support a certain control option (Kempston joystick, redefineable keys, etc)
+  * `Feature` - programs that share a certain feature (Random Levels, AY Sound, etc)
+  * `Screen Movement` - programs that implement a certain screen movement mode (Flip-screen, Vertical Scrolling, etc)
+  * `Graphical View` - programs that implement a certain graphical view style (Side-view, Isometric, Perspective, etc)
+  * `Control Option` - programs that support a certain control method (Kempston joystick, redefineable keys, etc)
+  * `Multiplayer Mode` - programs that support a certain multiplayer mode (Cooperative, Teamplay, Versus)
+  * `Turn Mode` - programs that implement a certain multiplayer turn mode (Alternating, Simultaneous, Turn based)
+  * `Native Programming Language` - programs programmed using directly a certain native programming language (either Sinclair BASIC or Assembly)
+  * `Cross-Platform Development Tool` - programs authored using a certain non-native development tool (z88dk, Boriel ZX BASIC, etc)
 
 * `tooltypes` - list of tool types (emulator, cross-development utility, etc)
 
