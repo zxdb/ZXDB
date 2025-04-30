@@ -3,19 +3,25 @@
 
 USE zxdb;
 
+drop table if exists tmp_review;
+drop table if exists tmp_score_groups;
+
 -- BUGFIXES!
-delete from zxsr.ssd_review_score where score_id=75052; -- duplicated
+update zxsr.ssd_review set game_id=31647 where game_id=31648; -- merged title
+delete from zxsr.ssd_review where review_id in (23888,22720,22837,22840); -- duplicated
+delete from zxsr.ssd_review where review_id in (18249,24279,6807); -- duplicated
+delete from zxsr.ssd_review where review_page in ('109110','120121','124125'); -- incorrect page numbers
+delete from zxsr.ssd_review_score where review_id in (24323,24175,24176,22806);
 delete from zxsr.ssd_review_score where review_id in (6993,6995,6996); -- duplicated
+-- delete from zxsr.ssd_review_score where score_id=75052; -- duplicated
 
 -- Delete previous ZXSR imports
 delete from zxsr_captions where 1=1;
--- delete from zxsr_scores where 1=1;
-delete from zxsr_scores where magref_id not in (select r.id from magrefs r inner join issues i on r.issue_id = i.id where i.magazine_id in (150,322));
+delete from zxsr_scores where 1=1;
 select * from magrefs where id >= 300000;
 delete from magreffeats where magref_id >= 300000;
 delete from magrefs where id >= 300000;
 update magrefs set review_id = null where 1=1;
--- update magrefs set award_id = null where 1=1;
 update magrefs set award_id = null where award_id <> 50;
 update magrefs set score_group='' where score_group not in ('Classic Adventure','Colossal Caves');
 delete from zxsr_reviews where 1=1;
@@ -43,7 +49,7 @@ create table tmp_review (
     constraint fk_tmp_review_magref foreign key (magref_id) references magrefs(id)
 );
 
-insert into tmp_review (id, page) (select review_id, trim(substring_index(replace(replace(lower(review_page),'(supplement)',''),'.',','),',',1)) from zxsr.ssd_review);
+insert into tmp_review (id, page) (select review_id, trim(substring_index(replace(replace(replace(lower(review_page),'(supplement)',''),'.',','),'-',','),',',1)) from zxsr.ssd_review);
 
 -- Whenever the same review of the same game appears twice in ZXSR, give each one a "score_group" name to distinguish between them
 create table tmp_score_groups (
@@ -106,7 +112,7 @@ insert into magrefs(id, referencetype_id, entry_id, issue_id, page, score_group)
 update tmp_review set magref_id = 300000+id where magref_id is null;
 
 -- Store review information in magrefs
-update magrefs r inner join tmp_review t on r.id = t.magref_id inner join zxsr.ssd_review z on t.id = z.review_id set r.award_id = if(z.award_id<>999, z.award_id, null), r.review_id = z.text_id where 1=1;
+update magrefs r inner join tmp_review t on r.id = t.magref_id inner join zxsr.ssd_review z on t.id = z.review_id set r.award_id = if(z.award_id not in (999,41), z.award_id, null), r.review_id = z.text_id where 1=1;
 
 -- Store review scores in ZXDB
 insert into zxsr_scores(magref_id, score_seq, category, is_overall, score, comments) (select t.magref_id, s.header_order, s.review_header, 0, nullif(concat(coalesce(trim(s.review_score),''),coalesce(trim(s.score_suffix),'')),''), nullif(replace(s.score_text,'\r',''),'') from tmp_review t inner join zxsr.ssd_review_score s on s.review_id = t.id order by t.magref_id, s.header_order);
@@ -141,6 +147,7 @@ insert into zxsr_captions(magref_id, caption_seq, text, is_banner) (select t.mag
 from zxsr.ssd_review_picture s
 inner join zxsr.ssd_review_picture_text p on s.text_id = p.text_id
 inner join tmp_review t on s.ReviewId = t.id
+group by t.magref_id, p.is_banner, p.pic_text
 order by t.magref_id, p.is_banner, p.pic_text);
 
 -- Calculate review picture description sequences
