@@ -15,6 +15,17 @@ delete from zxsr.ssd_review_score where review_id in (24323,24175,24176,22806);
 delete from zxsr.ssd_review_score where review_id in (6993,6995,6996); -- duplicated
 -- delete from zxsr.ssd_review_score where score_id=75052; -- duplicated
 
+-- Stardard names
+update zxsr.ssd_annualawards_details set AwardDescription='Best Coin-op Conversion' where AwardDescription='Best Coin-op conversion';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Licence (Not Coin-op) (Nick Roberts)' where AwardDescription='Best Licence (not coin-op) (Nick Roberts)';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Licence (Not Coin-op) (Oliver Frey)' where AwardDescription='Best Licence (not coin-op) (Oliver Frey)';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Licence (Not Coin-op) (Richard Eddy)' where AwardDescription='Best Licence (not coin-op) (Richard Eddy)';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Looking Advert To Appear In A Magazine' where AwardDescription='Best Looking Advert To Appear In a Magazine';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Shoot''Em Up' where AwardDescription='Best Shoot Em Up';
+update zxsr.ssd_annualawards_details set AwardDescription='State Of The Art Award' where AwardDescription='State of the Art Award';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Coin-op Conversion of the Year 8-bit' where AwardDescription='Best Coin-Op Conversion of the Year 8-bit';
+update zxsr.ssd_annualawards_details set AwardDescription='Best Coin-op Conversion of the Year 16-bit' where AwardDescription='Best Coin-Op Conversion of the Year 16-bit';
+
 -- Delete previous ZXSR imports
 delete from zxsr_captions where 1=1;
 delete from zxsr_scores where 1=1;
@@ -25,6 +36,12 @@ update magrefs set review_id = null where 1=1;
 update magrefs set award_id = null where award_id <> 50;
 update magrefs set score_group='' where score_group not in ('Classic Adventure','Colossal Caves');
 delete from zxsr_reviews where 1=1;
+delete from members where tag_id in (select id from tags where tagtype_id='A' and (name like 'Crash Readers Awards %') or name like 'C&VG Golden Joystick Awards %');
+select awarder, awarddescription from zxsr.ssd_annualawards_details where awarddescription not in (select text from categories) and awarder in ('Crash','Golden Joysticks') and awarddescription not like '% 16-bit' and awarddescription not like 'Console Game%' and zxdbid is not null and zxdbid<>'' group by awarder, awarddescription order by awarder, awarddescription;
+
+-- Store awards in ZXDB
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Crash Readers Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Crash' and s.zxdbid is not null and s.zxdbid<>'');
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('C&VG Golden Joystick Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Golden Joysticks' and s.zxdbid is not null and s.zxdbid<>'');
 
 -- Store review text in ZXDB
 insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select text_id, replace(review_text,'\r',''), replace(replace(review_comments,'\r',''),'¬','\n\n\n\n'), replace(review_rating,'\r',''), reviewers from zxsr.ssd_review_text);
