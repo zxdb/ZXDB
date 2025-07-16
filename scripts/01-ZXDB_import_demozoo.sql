@@ -88,7 +88,17 @@ inner join public.productions_productionlink k on p.id = k.production_id and k.l
 where e.id not in (select entry_id from zxdb.webrefs where website_id=49)
 order by e.id;
 
--- Mismatching Pouet links
+-- Add missing Itch.io links
+select concat('(',w.entry_id,', ''',k.parameter,''', ''en'', 31),')
+as 'insert into webrefs(entry_id, link, language_id, website_id) values'
+from zxdb.entries e
+inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
+inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
+inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'BaseUrl' and k.parameter like '%.itch.io/%'
+where e.id not in (select entry_id from zxdb.webrefs where website_id=31)
+order by e.id;
+
+-- List mismatching Pouet links
 select w2.link, k.parameter,w.entry_id,p.id
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
@@ -96,6 +106,16 @@ inner join public.productions_production p on p.id = replace(replace(w.link,'htt
 inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'PouetProduction'
 inner join zxdb.webrefs w2 on w2.entry_id = e.id and w2.website_id = 49
 where w2.link <> concat('https://www.pouet.net/prod.php?which=',k.parameter)
+order by e.id;
+
+-- List mismatching Itch.io links
+select w2.link, k.parameter,w.entry_id,p.id
+from zxdb.entries e
+inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
+inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
+inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'BaseUrl' and k.parameter like '%.itch.io/%'
+inner join zxdb.webrefs w2 on w2.entry_id = e.id and w2.website_id = 31
+where w2.link <> k.parameter
 order by e.id;
 
 -- ZXDB links missing from Demozoo
@@ -107,22 +127,36 @@ left join public.productions_productionlink k on p.id = k.production_id and k.li
 where k.link_class is null;
 
 -- Demozoo links missing from ZXDB
-select e.id, concat('https://demozoo.org/productions/',p.id,'/')
-from public.productions_production p
-inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'SpectrumComputingRelease'
-inner join zxdb.entries e on e.id = k.parameter
-left join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48 and concat('https://demozoo.org/productions/',p.id,'/') = w.link
-where w.entry_id is null;
-
--- Demozoo links missing from ZXDB through Pouet
-select concat('(',w.entry_id,', ''https://demozoo.org/productions/',p.id,'/'', ''en'', 48),')
+select concat('(',entry_id,', ''https://demozoo.org/productions/',production_id,'/'', ''en'', 48),')
 as 'insert into webrefs(entry_id, link, language_id, website_id) values'
-from zxdb.entries e
-inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 49
-inner join public.productions_productionlink k on k.link_class = 'PouetProduction' and w.link = concat('https://www.pouet.net/prod.php?which=',k.parameter)
-inner join public.productions_production p on p.id = k.production_id
-where e.id not in (select entry_id from zxdb.webrefs where website_id = 48)
-and p.id not in (select production_id from public.productions_productionlink where link_class = 'SpectrumComputingRelease')
-order by e.id;
+from (
+-- Link from Demozoo to ZXDB but not vice-versa
+  select e.id as entry_id, k.production_id
+  from public.productions_production p
+  inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'SpectrumComputingRelease'
+  inner join zxdb.entries e on e.id = k.parameter
+  left join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48 and concat('https://demozoo.org/productions/',p.id,'/') = w.link
+  where w.entry_id is null
+union all
+-- Both sites sharing links to Pouet
+  select w.entry_id, k.production_id
+  from zxdb.entries e
+  inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 49
+  inner join public.productions_productionlink k on k.link_class = 'PouetProduction' and w.link = concat('https://www.pouet.net/prod.php?which=',k.parameter)
+  inner join public.productions_production p on p.id = k.production_id
+  where e.id not in (select entry_id from zxdb.webrefs where website_id = 48)
+union all
+-- Both sites sharing links to Itch.io
+  select w.entry_id, k.production_id
+  from zxdb.entries e
+  inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 31
+  inner join public.productions_productionlink k on k.link_class = 'BaseUrl' and k.parameter like '%.itch.io/%' and w.link = k.parameter
+  inner join public.productions_production p on p.id = k.production_id
+  inner join public.productions_production_platforms r on p.id = r.production_id
+  where e.id not in (select entry_id from zxdb.webrefs where website_id = 48)
+  and ((r.platform_id=2 and e.machinetype_id between 1 and 10) or (r.platform_id=45 and e.machinetype_id between 19 and 24) or (r.platform_id=95 and e.machinetype_id=17) or (r.platform_id=51 and e.machinetype_id=16) or (r.platform_id=69 and e.machinetype_id in (14,15,25,26,27)))
+) as z
+group by entry_id, production_id
+order by entry_id, production_id;
 
 -- END

@@ -7,6 +7,8 @@ drop table if exists tmp_review;
 drop table if exists tmp_score_groups;
 
 -- BUGFIXES!
+update zxsr.ssd_annualawards_details set zxdbId=1270 where zxdbId='1279';
+update zxsr.ssd_annualawards_details set zxdbId=zxdbId-9000000 where zxdbId is not null and zxdbId<>'' and zxdbId>10000000;
 update zxsr.ssd_review set game_id=31647 where game_id=31648; -- merged title
 delete from zxsr.ssd_review where review_id in (23888,22720,22837,22840); -- duplicated
 delete from zxsr.ssd_review where review_id in (18249,24279,6807); -- duplicated
@@ -36,15 +38,17 @@ update magrefs set review_id = null where 1=1;
 update magrefs set award_id = null where award_id <> 50;
 update magrefs set score_group='' where score_group not in ('Classic Adventure','Colossal Caves');
 delete from zxsr_reviews where 1=1;
-delete from members where tag_id in (select id from tags where tagtype_id='A' and (name like 'Crash Readers Awards %') or name like 'Golden Joystick Awards %' or name like 'Your Computer - Year''s Best %' or name like 'C&VG %Top Ten%' or name like 'Tilt Magazine Awards %');
-select awarder, awarddescription from zxsr.ssd_annualawards_details where replace(awarddescription,' of 1986','') not in (select text from categories) and awarder in ('Crash','Golden Joysticks','Your Computer','Computer and Video Games') and awarddescription not like '% 16-bit' and awarddescription not like 'Console Game%' and zxdbid is not null and zxdbid<>'' group by awarder, awarddescription order by awarder, awarddescription;
+delete from members where tag_id in (select id from tags where tagtype_id='A' and (name like 'Big K - Readers Poll%' or name like 'C&VG %Top Ten%' or name like 'Crash Readers Awards %') or name like 'Golden Joystick Awards %' or name like 'Tilt Magazine Awards %' or name like 'Your Computer - Year''s Best %' or name like 'Your Spectrum Strangled Turkey Awards %');
+select awarder, awarddescription from zxsr.ssd_annualawards_details where replace(awarddescription,' of 1986','') not in (select text from categories) and awarder in ('Big K','Computer and Video Games','Crash','Golden Joysticks','Your Computer','Your Spectrum') and awarddescription not like '% 16-bit' and awarddescription not like 'Console Game%' and zxdbid is not null and zxdbid<>'' group by awarder, awarddescription order by awarder, awarddescription;
 
 -- Store awards in ZXDB
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Big K - Readers Poll ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Big K' and s.zxdbid is not null and s.zxdbid<>'');
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, 1, NULL from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name like concat('C&VG %Top Ten ',s.year) where s.awarder='Computer and Video Games' and s.zxdbid is not null and s.zxdbid<>'');
 insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Crash Readers Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Crash' and s.zxdbid is not null and s.zxdbid<>'');
 insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Golden Joystick Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Golden Joysticks' and s.zxdbid is not null and s.zxdbid<>'');
-insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Your Computer - Year''s Best ',s.year) inner join categories c on c.text=replace(s.awarddescription,concat(' of ',s.year),'') where s.awarder='Your Computer' and s.zxdbid is not null and s.zxdbid<>'');
-insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, 1, NULL from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name like concat('C&VG %Top Ten ',s.year) where s.awarder='Computer and Video Games' and s.zxdbid is not null and s.zxdbid<>'');
 insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Tilt Magazine Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Computer and Video Games' and s.zxdbid is not null and s.zxdbid<>'');
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Your Computer - Year''s Best ',s.year) inner join categories c on c.text=replace(s.awarddescription,concat(' of ',s.year),'') where s.awarder='Your Computer' and s.zxdbid is not null and s.zxdbid<>'');
+insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Your Spectrum Strangled Turkey Awards ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Your Spectrum' and s.zxdbid is not null and s.zxdbid<>'');
 
 -- Store review text in ZXDB
 insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select text_id, replace(review_text,'\r',''), replace(replace(review_comments,'\r',''),'¬','\n\n\n\n'), replace(review_rating,'\r',''), reviewers from zxsr.ssd_review_text);
