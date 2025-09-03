@@ -10,6 +10,7 @@ drop table if exists tmp_score_groups;
 update zxsr.ssd_annualawards_details set zxdbId=1270 where zxdbId='1279';
 update zxsr.ssd_annualawards_details set zxdbId=zxdbId-9000000 where zxdbId is not null and zxdbId<>'' and zxdbId>10000000;
 update zxsr.ssd_review set game_id=31647 where game_id=31648; -- merged title
+update zxsr.ssd_review set game_id=28642 where game_id=28643; -- merged title
 delete from zxsr.ssd_review where review_id in (23888,22720,22837,22840); -- duplicated
 delete from zxsr.ssd_review where review_id in (18249,24279,6807); -- duplicated
 delete from zxsr.ssd_review where review_page in ('109110','120121','124125'); -- incorrect page numbers
