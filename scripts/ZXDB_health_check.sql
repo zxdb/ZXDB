@@ -165,7 +165,7 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,k.title,'program can either support or require hardware (not both)' from entries e inner join relations r1 on r1.entry_id = e.id and r1.relationtype_id = 'h' inner join entries k on r1.original_id = k.id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = 't' and r2.original_id = k.id
     union all
         select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1)) and e.id > 39000
-) as warnings
+) as problems
 order by entry_id, details;
 
 -- WARNINGS
