@@ -68,7 +68,7 @@ inner join zxdb.categories g on g.text = 'Invitation'
 left join zxdb.members m on m.tag_id = t.id and m.entry_id = e.id
 where m.tag_id is null
 union all
-select e.id, t.id, 'null', ''
+select e.id, t.id, 1, ''
 from zxdb.entries e
 inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
