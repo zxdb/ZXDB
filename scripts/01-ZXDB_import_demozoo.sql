@@ -25,7 +25,7 @@ inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
 inner join public.parties_party_invitations i on p.id = i.production_id
 inner join public.parties_party y on i.party_id = y.id) as x
-where name not in (select name from zxdb.tags)
+where name not in (select name from zxdb.tags) and name not like 'Comp Sys Sinclair Crap Games Competition %'
 group by id
 order by name;
 

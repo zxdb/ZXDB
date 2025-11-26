@@ -26,6 +26,14 @@ create table tmp_mapy (
 
 load data local infile 'mapy.txt' into table tmp_mapy character set latin2 fields terminated by ';' lines terminated by '\n';
 
+update tmp_mapy set id=44816 where file_image='LodeRanger.png';
+update tmp_mapy set id=44821 where file_image='LodeRunner3_2.png';
+update tmp_mapy set id=44822 where file_image='LodeRunner3_3.png';
+update tmp_mapy set id=44823 where file_image='LodeRunner4.png';
+update tmp_mapy set id=44824 where file_image='LodeRunner4_2.png';
+
+select * from tmp_mapy where id not in (select id from entries) or id in (select id from entries where availabletype_id='*');
+
 delete from webrefs where website_id = 6;
 
 insert into webrefs(entry_id, link, website_id, language_id) (select id, concat('http://maps.speccy.cz/map.php?id=',left(file_image,length(file_image)-4)), 6, 'en' from tmp_mapy where id <> '' and id in (select id from entries) group by id, file_image order by id);
