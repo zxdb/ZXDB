@@ -27,7 +27,7 @@ select * from (
     union all
         select e.id,e.title,g.text,'game editor that is not utility' from relations r inner join entries e on r.entry_id = e.id left join genretypes g on e.genretype_id = g.id where r.relationtype_id = 'e' and g.text not like 'Utility:%'
     union all
-        select null,null,b1.name,'possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b1.name not like '% [Bearsden Primary %]' and b2.id is null 
+        select null,null,b1.name,'possibly unnecessary index in unique label name' from labels b1 left join labels b2 on b1.id <> b2.id and b2.name like concat(trim(substring_index(b1.name, '[', 1)),'%') where b1.name like '% [%]' and b1.name not like '% [Bearsden Primary %]' and b2.id is null
     union all
         select e.id,e.title,concat(b.name,' / ',t.name),'author''s team must be a company' from entries e inner join authors a on e.id = a.entry_id inner join labels t on t.id = a.team_id inner join labels b on b.id = a.label_id where t.labeltype_id in ('+','-') or t.labeltype_id is null
     union all
@@ -54,8 +54,6 @@ select * from (
         select e.id,e.title,d.file_link,'invalid remote link' from downloads d inner join entries e on d.entry_id = e.id where d.filetype_id = 0 and d.file_link not like 'http%'
     union all
         select e.id,e.title,d.file_link,'source code with incorrect filetype' from downloads d inner join entries e on d.entry_id = e.id where d.file_link like '%SourceCode%' and d.filetype_id not in (32,71)
-    union all
-        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id between 1 and 3 and d.scr_border<>7
     union all
         select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have loading screen' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id = 1 and e.id not in (31929)
     union all
@@ -126,8 +124,6 @@ select * from (
         select null,null,concat(name,' (',id,')'),'missing list of magazine issues' from magazines where (link_mask is not null or archive_mask is not null) and id not in (select magazine_id from issues)
     union all
         select e.id,e.title,t.text,'title cannot have multiple origins' from entries e inner join relations r1 on r1.entry_id = e.id inner join relationtypes t on t.id = r1.relationtype_id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = r1.relationtype_id and r2.original_id > r1.original_id where t.id in ('p','u')
-    union all
-        select e.id,e.title,d.file_link,'itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
     union all
         select e.id,e.title,c.container_id,'redundant alias in contents' from entries e inner join contents c on e.id = c.entry_id where e.title = c.alias
     union all
@@ -223,6 +219,10 @@ select * from (
         select e.id,e.title,concat(m.name,' - issue_id ',r1.issue_id,' pg ',r1.page,' vs issue_id ',r2.issue_id,' pg ',r2.page),'mismatching review reference with ZXSR' from entries e inner join magrefs r1 on r1.entry_id = e.id and r1.referencetype_id = 10 and r1.review_id is null inner join issues i1 on r1.issue_id = i1.id inner join magazines m on i1.magazine_id = m.id inner join magrefs r2 on r2.entry_id = e.id and r2.referencetype_id = 10 and r2.review_id is not null inner join issues i2 on r2.issue_id = i2.id and i2.magazine_id = i1.magazine_id and r1.id not in (select magref_id from magreffeats where feature_id=6455)
     union all
         select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1))
+    union all
+        select e.id,e.title,d.file_link,'itch.io links must be moved to webrefs' from entries e inner join downloads d on e.id = d.entry_id where d.filetype_id = 0 and d.file_link like '%itch.io%'
+    union all
+        select e.id,e.title,d.file_link,'ZX80/ZX81 cannot have non-white border' from downloads d inner join entries e on d.entry_id = e.id where coalesce(d.machinetype_id, e.machinetype_id) between 18 and 24 and d.filetype_id between 1 and 3 and d.scr_border<>7
 ) as warnings
 order by entry_id, details;
 

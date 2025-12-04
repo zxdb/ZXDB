@@ -7,20 +7,6 @@ drop table if exists tmp_caption;
 drop table if exists tmp_review;
 drop table if exists tmp_score_groups;
 
--- BUGFIXES!
-update zxsr.ssd_review set game_id=28642 where game_id=28643; -- merged title
-delete from zxsr.ssd_review where review_id in (24437,24566,24586,24587); -- duplicated
-
--- Foreign keys and indexes
--- alter table zxsr.ssd_review add index ix_ssd_review_zxdb(game_id, zxdb_issue_id);
--- alter table zxsr.ssd_review add constraint fk_ssd_review_text foreign key (text_id) references zxsr.ssd_review_text(text_id);
--- alter table zxsr.ssd_review add constraint fk_ssd_review_award foreign key (award_id) references zxsr.ssd_lookreviewaward(id);
--- alter table zxsr.ssd_review_intro add constraint fk_ssd_review_intro_text foreign key (intro_text_id) references zxsr.ssd_review_intro_text(text_id);
--- alter table zxsr.ssd_review_intro add constraint fk_ssd_review_intro_id foreign key (review_id) references zxsr.ssd_review(review_id);
--- alter table zxsr.ssd_review_score add constraint fk_ssd_review_score_header foreign key (header_id) references zxsr.ssd_review_score_header(header_id);
--- alter table zxsr.ssd_review_score_text add constraint fk_ssd_review_score_text_id foreign key (review_id) references zxsr.ssd_review(review_id);
--- alter table zxsr.ssd_review_score_compilations add constraint fk_ssd_review_score_comp_id foreign key (review_id) references zxsr.ssd_review(review_id);
-
 -- Stardard names
 update zxsr.ssd_annualawards_details set AwardDescription='Best Coin-op Conversion' where AwardDescription='Best Coin-op conversion';
 update zxsr.ssd_annualawards_details set AwardDescription=replace(AwardDescription, '(not coin-op)', '(Not Coin-op)') where AwardDescription like '%(not coin-op)%';
@@ -42,6 +28,13 @@ update magrefs set score_group='' where score_group not in ('Classic Adventure',
 delete from zxsr_reviews where 1=1;
 delete from members where tag_id in (select id from tags where tagtype_id='A' and (name like 'Big K - Readers Poll%' or name like 'C&VG %Top Ten%' or name like 'Crash Readers Awards %') or name like 'Golden Joystick Awards %' or name like 'Tilt Magazine Awards %' or name like 'Your Computer - Year''s Best %' or name like 'Your Spectrum Strangled Turkey Awards %');
 select awarder, awarddescription from zxsr.ssd_annualawards_details where replace(awarddescription,' of 1986','') not in (select text from categories) and awarder in ('Big K','Computer and Video Games','Crash','Golden Joysticks','Your Computer','Your Spectrum') and awarddescription not like '% 16-bit' and awarddescription not like 'Console Game%' and zxdbid is not null and zxdbid<>'' group by awarder, awarddescription order by awarder, awarddescription;
+
+-- Foreign keys consistency
+select * from zxsr.ssd_review where game_id not in (select id from entries where availabletype_id is null or availabletype_id<>'*') or text_id not in (select text_id from zxsr.ssd_review_text) or award_id not in (select id from zxsr.ssd_lookreviewaward);
+select * from zxsr.ssd_review_intro where intro_text_id not in (select text_id from zxsr.ssd_review_intro_text) or review_id not in (select review_id from zxsr.ssd_review);
+select * from zxsr.ssd_review_score where header_id not in (select header_id from zxsr.ssd_review_score_header);
+select * from zxsr.ssd_review_score_compilations where review_id not in (select review_id from zxsr.ssd_review);
+select * from zxsr.ssd_review_score_text where review_id not in (select review_id from zxsr.ssd_review);
 
 -- Store awards in ZXDB
 insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Big K - Readers Poll ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Big K' and s.zxdbid is not null and s.zxdbid<>'');
