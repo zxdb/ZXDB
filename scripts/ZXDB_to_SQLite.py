@@ -12,31 +12,31 @@ with codecs.open(r"ZXDB_mysql.sql",'r','utf-8') as f:
                 inHeader = 0
         else:
             # strip out backticks
-            line = line.replace('`','') 
-            # convert escaped single quotes
-            line = line.replace(r"\'","''") 
-            # change collation 
+            line = line.replace('`','')
+            # convert escaped single quotes and escaped backslashes
+            line = line.replace(r"\'","''").replace("\\\\", "\\")
+            # change collation
             line = line.replace('utf8_bin','rtrim').replace('utf8_unicode_ci','rtrim')
             # remove character set
             line = line.replace('CHARACTER SET utf8', '')
             # get rid of auto-increment, as SQLite doesn't support it well enough
-            line = line.replace('AUTO_INCREMENT','') 
+            line = line.replace('AUTO_INCREMENT','')
             # tidy up MySql-isms from end of table definitions
             if line.startswith(') ENGINE'):
-                line =')'          
+                line =')'
 
             # SQLite doesn't like unsigned, so manually convert to an integer
             line = re.sub(r'int\s*\(\d+\)\s+unsigned','INTEGER',line, flags=re.I)
 
             # strip out indexes
             if re.match(r'\s*KEY',line,re.I):
-                line = '' 
+                line = ''
 
             # fix unique constraint syntax and remove names
             line = re.sub(r'\s*UNIQUE KEY \w*\s*\(','UNIQUE (',line)
 
             outFile.write(line)
-            
+
         if linecount % 10000 == 0:
-            print(linecount)        
+            print(linecount)
 outFile.close()
