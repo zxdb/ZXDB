@@ -347,6 +347,8 @@ The following websites directly use ZXDB internally:
 
 * [ZX Pokemaster](https://sourceforge.net/projects/zx-pokemaster/) - Tool for organizing ZX-Spectrum files by **Elia Iliashenko**, it includes content imported periodically from ZXDB.
 
+* [CompilationZX](https://compilationzx.com/) - A site dedicated to ZX Spectrum game compilations maintained by **SirClive**, powered by ZXDB.
+
 * [Lisias' Raspberry Pi](http://service.retro.lisias.net/db/) - ZX-Spectrum search engine based on ZXDB, built on Raspberry Pi by **Lisias Toledo**.
 
 * [WorldOfSpectrum Classic](https://worldofspectrum.net/) - The remake of Martijn's original ZX-Spectrum archive is now powered by ZXDB.
