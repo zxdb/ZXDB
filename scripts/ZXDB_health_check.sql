@@ -154,13 +154,15 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
     union all
         select e.id,e.title,g.text,'unidentified demoscene intro' from entries e inner join genretypes g on g.id = e.genretype_id inner join members m on m.entry_id = e.id inner join categories c on m.category_id = c.id where g.text like 'Demoscene%' and e.genretype_id not in (74,75) and c.text like '%Intro%' and c.text not like '%Intro/Demo%'
     union all
-        select e.id,e.title,k.title,'compilation inside another compilation' from entries e inner join genretypes g on e.genretype_id = g.id inner join contents c on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join genretypes g2 on k.genretype_id = g2.id where g.text like 'Compilation%' and g2.text like 'Compilation%'
+        select e.id,e.title,k.title,'compilation inside another compilation' from entries e inner join genretypes g on e.genretype_id = g.id inner join contents c on c.entry_id = e.id inner join entries k on c.container_id = k.id inner join genretypes g2 on k.genretype_id = g2.id where g.text like 'Compilation%' and g2.text like 'Compilation%' and e.id not in (834)
     union all
         select e.id,e.title,d.file_link,'invalid screenshot' from entries e inner join downloads d on d.entry_id = e.id where file_link like '%.scr' and file_size not in (6912,6928,6976,12288,12289)
     union all
         select e.id,e.title,k.title,'program can either support or require hardware (not both)' from entries e inner join relations r1 on r1.entry_id = e.id and r1.relationtype_id = 'h' inner join entries k on r1.original_id = k.id inner join relations r2 on r2.entry_id = e.id and r2.relationtype_id = 't' and r2.original_id = k.id
     union all
         select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1)) and e.id > 39000
+    union all
+        select e.id,e.title,n.text,'possibly duplicated title' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion%' and e.id > 35000
 ) as problems
 order by entry_id, details;
 
