@@ -105,7 +105,7 @@ inner join zxdb.webrefs w on w.entry_id = e.id and w.website_id = 48
 inner join public.productions_production p on p.id = replace(replace(w.link,'https://demozoo.org/productions/',''),'/','')
 inner join public.productions_productionlink k on p.id = k.production_id and k.link_class = 'PouetProduction'
 inner join zxdb.webrefs w2 on w2.entry_id = e.id and w2.website_id = 49
-where w2.link <> concat('https://www.pouet.net/prod.php?which=',k.parameter)
+where w2.link <> concat('https://www.pouet.net/prod.php?which=',k.parameter) and e.id <> 27300
 order by e.id;
 
 -- List mismatching Itch.io links

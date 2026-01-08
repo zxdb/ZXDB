@@ -163,6 +163,8 @@ r.link like concat(w.link,'%') or (r.website_id=10 and r.link like 'https://%.wi
         select e.id,e.title,null,'conflicting original publisher' from entries e where e.id in (select entry_id from publishers where release_seq = 0) and (e.id in (select entry_id from contents where is_original=1) or e.id in (select entry_id from booktypeins where is_original=1) or e.id in (select entry_id from magrefs where is_original=1)) and e.id > 39000
     union all
         select e.id,e.title,n.text,'possibly duplicated title' from entries e inner join notes n on e.id = n.entry_id where n.text like 'Conversion%' and e.id > 35000
+    union all
+        select null,null,name,'cross-dev tag without tool' from tags where tagtype_id = 'X' and tool_id is null
 ) as problems
 order by entry_id, details;
 
