@@ -81,7 +81,7 @@ select * from (
     union all
         select null,null,concat('License: ',name,' (',id,')'),'license without any entries' from licenses where id not in (select license_id from relatedlicenses)
     union all
-        select e.id,e.title,t.text,'container that is not compilation, covertape or e-magazine' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select container_id from contents) and e.id not in (select container_id from contents where container_id = entry_id) and (e.genretype_id is null or e.genretype_id < 80)
+        select e.id,e.title,t.text,'container that is not compilation, covertape or e-magazine' from entries e left join genretypes t on t.id = e.genretype_id where e.id in (select container_id from contents) and e.id not in (select container_id from contents where container_id = entry_id) and (e.genretype_id is null or (e.genretype_id < 80 and e.genretype_id<>68))
     union all
         select null,null,name,'non e-magazine incorrectly classified as e-magazine' from magazines where id not in (select magazine_id from issues j inner join entries e on j.id = e.issue_id where e.genretype_id = 82) and magtype_id = 'E'
     union all
