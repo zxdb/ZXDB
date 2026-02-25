@@ -367,6 +367,8 @@ The following websites are fully integrated with ZXDB:
 
 * [LemonAmiga](https://www.lemonamiga.com/) - Each ZXDB title links to the corresponding Amiga version at another **Kim Lemon**'s site (whenever it exists), and vice-versa.
 
+* [Lemon20](https://www.lemon20.com/) - Each ZXDB title links to the corresponding VIC-20 version at yet another **Kim Lemon**'s site (whenever it exists), and vice-versa.
+
 * [Classic Adventures Solution Archive](http://www.solutionarchive.com/) - Each adventure title in ZXDB links to the corresponding webpage at CASA, and vice-versa.
 
 * [Demozoo](https://demozoo.org/) - Each scene demo in ZXDB links to the corresponding webpage at **Matt Westcott**'s site, and vice-versa.
