@@ -7,6 +7,12 @@ drop table if exists tmp_caption;
 drop table if exists tmp_review;
 drop table if exists tmp_score_groups;
 
+-- Foreign keys
+-- alter table zxsr.ssd_issues_extra add constraint fk_extra_editor foreign key (editor_id) references zxsr.ssd_entity(id);
+-- alter table zxsr.ssd_issues_extra add constraint fk_extra_flannel foreign key (flannel_panel_text_id) references zxsr.ssd_issues_flannel_panel(text_id);
+-- alter table zxsr.ssd_review_reviewers add constraint fk_reviewer_entity foreign key (entity_id) references zxsr.ssd_entity(id);
+-- alter table zxsr.ssd_review_score_text add constraint fk_score_review foreign key (review_id) references zxsr.ssd_review(review_id);
+
 -- Stardard names
 update zxsr.ssd_annualawards_details set AwardDescription='Best Coin-op Conversion' where AwardDescription='Best Coin-op conversion';
 update zxsr.ssd_annualawards_details set AwardDescription=replace(AwardDescription, '(not coin-op)', '(Not Coin-op)') where AwardDescription like '%(not coin-op)%';
@@ -35,6 +41,7 @@ select * from zxsr.ssd_review_intro where intro_text_id not in (select text_id f
 select * from zxsr.ssd_review_score where header_id not in (select header_id from zxsr.ssd_review_score_header);
 select * from zxsr.ssd_review_score_compilations where review_id not in (select review_id from zxsr.ssd_review);
 select * from zxsr.ssd_review_score_text where review_id not in (select review_id from zxsr.ssd_review);
+select * from zxsr.ssd_issues_extra where issue_id not in (select id from issues);
 
 -- Store awards in ZXDB
 insert into members(tag_id, entry_id, category_id, member_seq) (select t.id, s.zxdbid, c.id, s.placing from tags t inner join zxsr.ssd_annualawards_details s on t.tagtype_id='A' and t.name=concat('Big K - Readers Poll ',s.year) inner join categories c on c.text=s.awarddescription where s.awarder='Big K' and s.zxdbid is not null and s.zxdbid<>'');
@@ -55,7 +62,7 @@ inner join zxsr.ssd_review_text t on r.text_id = t.text_id
 left join zxsr.ssd_review_intro i on i.review_id=r.review_id
 left join zxsr.ssd_review_intro_text x on i.intro_text_id=x.text_id);
 
--- insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select t.text_id, replace(t.review_text,'\r',''), group_concat(replace(replace(s.comment,'\r',''),'¬','\n\n\n\n') order by s.reviewer_id separator ', '), replace(t.review_rating,'\r',''), group_concat(b.reviewer order by b.reviewerid separator ', ') from zxsr.ssd_review_text t left join zxsr.ssd_review_reviewers s on t.review_id = s.review_id left join zxsr.ssd_reviewer b on s.reviewer_id = b.reviewerid group by t.text_id);
+-- insert into zxsr_reviews(id, review_text, review_comments, review_rating, reviewers) (select t.text_id, replace(t.review_text,'\r',''), group_concat(replace(replace(s.comment,'\r',''),'¬','\n\n\n\n') order by s.entity_id separator ', '), replace(t.review_rating,'\r',''), group_concat(b.entity_name order by b.entity_id separator ', ') from zxsr.ssd_review_text t left join zxsr.ssd_review_reviewers s on t.review_id = s.review_id left join zxsr.ssd_entity b on s.entity_id = b.id group by t.text_id);
 
 update zxsr_reviews set review_text = SUBSTR(review_text,2) where review_text like '\n%';
 update zxsr_reviews set review_text = SUBSTR(review_text,1,CHAR_LENGTH(review_text)-2) where review_text like '%\n\n';
@@ -157,11 +164,11 @@ inner join zxsr.ssd_review_score_header h on s.header_id = h.header_id
 left join zxsr.ssd_review_score_text x on s.review_id = x.review_id and s.header_order = x.header_order
 order by t.magref_id, s.header_order);
 
-insert into zxsr_scores(magref_id, score_seq, category, score, comments) (select t.magref_id, null, w.reviewer, nullif(concat(coalesce(trim(s.score),''),coalesce(trim(s.score_suffix),'')),''), nullif(replace(s.comment,'\r',''),'')
+insert into zxsr_scores(magref_id, score_seq, category, score, comments) (select t.magref_id, null, w.entity_name, nullif(concat(coalesce(trim(s.score),''),coalesce(trim(s.score_suffix),'')),''), nullif(replace(s.comment,'\r',''),'')
 from tmp_review t
 inner join zxsr.ssd_review_reviewers s on s.review_id = t.id
-inner join zxsr.ssd_reviewer w on s.reviewer_id = w.reviewerid
-order by t.magref_id, w.reviewer, s.comment);
+inner join zxsr.ssd_entity w on s.entity_id = w.id
+order by t.magref_id, w.entity_name, s.comment);
 
 -- Add a reference to the compilation content's review in ZXDB if it's not already there
 insert into magrefs(id, referencetype_id, entry_id, issue_id, page, score_group, review_id) (select 350000+c.score_id, 10, c.game_id, z.zxdb_issue_id, t.page, if(c.game_id=2081,'Compilation',''), z.review_id
