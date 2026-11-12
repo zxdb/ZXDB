@@ -335,7 +335,7 @@ Also special thanks to everyone that contributed to the creation of ZXDB, partic
 
 The following websites directly use ZXDB internally:
 
-* [Spectrum Computing](https://spectrumcomputing.co.uk/) - ZX-Spectrum archive based on ZXDB, maintained by **Peter Jones** and **Ricardo Nunes**.
+* [Spectrum Computing](https://spectrumcomputing.co.uk/) - ZX-Spectrum archive based on ZXDB, built by **Peter Jones** and **Ricardo Nunes**, maintained by **Thomas Kolbeck**.
 
 * [ZXInfo](https://zxinfo.dk/) - ZX-Spectrum archive based on ZXDB, built with ElasticSearch by **Thomas Kolbeck**.
 
@@ -351,9 +351,11 @@ The following websites directly use ZXDB internally:
 
 * [Lisias' Raspberry Pi](http://service.retro.lisias.net/db/) - ZX-Spectrum search engine based on ZXDB, built on Raspberry Pi by **Lisias Toledo**.
 
+* [Sinclair Archive](https://www.zx-spectrum-archive.uk/) - Another ZX-Spectrum archive based on ZXDB, also containing analysis and statistics.
+
 * [WorldOfSpectrum Classic](https://worldofspectrum.net/) - The remake of Martijn's original ZX-Spectrum archive is now powered by ZXDB.
 
-* [New WorldOfSpectrum](https://worldofspectrum.org/) - ZX-Spectrum archive rebuilt by **Lee Fogarty**, it was launched in June 2020 although using ZXDB version 1.08 from September 2018.
+* [New WorldOfSpectrum](https://worldofspectrum.org/) - ZX-Spectrum archive rebuilt by **Lee Fogarty**, it was launched in June 2020 although (still) using ZXDB version 1.08 from September 2018.
 
 The following websites are fully integrated with ZXDB:
 
