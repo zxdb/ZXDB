@@ -1,10 +1,9 @@
 import re
-import codecs
 
 linecount=0
 inHeader = 1
-outFile = codecs.open(r"ZXDB_sqlite.sql",'w','utf-8')
-with codecs.open(r"ZXDB_mysql.sql",'r','utf-8') as f:
+outFile = open('ZXDB_sqlite.sql', 'w', encoding='utf-8')
+with open('ZXDB_mysql.sql', 'r', encoding='utf-8') as f:
     for line in f:
         linecount = linecount + 1
         if inHeader:
